@@ -97,7 +97,7 @@ const SCREENS = {
 };
 
 function brand() {
-  return '<div class="brandrow"><div class="logo">' + ICON.shield + '</div><div><div class="name">Intune Inspector</div><div class="small muted">TD SYNNEX Cloud Solutions</div></div></div>';
+  return '<div class="brandrow"><div class="logo">' + ICON.shield + '</div><div><div class="name">Intune Inspector</div><div class="small muted">' + esc(state.cfg.brandLabel || 'Intune-Dokumentation & Analyse') + '</div></div></div>';
 }
 
 function screenSetup() {
@@ -483,7 +483,7 @@ function viewExport() {
       AREAS.filter((a) => counts[a]).map((a) => '<label class="check"><input type="checkbox" data-ch="exArea" data-area="' + esc(a) + '"' + (e.areas.has(a) ? ' checked' : '') + '><span>' + esc(a) + ' <span class="faint mono">' + counts[a] + '</span></span></label>').join('') + '</div></div>' : '') +
     (!isCsv ? '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">' +
       '<label class="field" for="exCustomer">Kunde (Titel)<input class="input" id="exCustomer" data-in="exCustomer" placeholder="' + esc(state.snap.tenant.displayName || '') + '" value="' + esc(e.customer) + '"></label>' +
-      '<label class="field" for="exPartner">Partner (Branding)<input class="input" id="exPartner" data-in="exPartner" placeholder="z. B. FS Final Systems GmbH" value="' + esc(e.partner) + '"></label>' +
+      '<label class="field" for="exPartner">Partner (Branding)<input class="input" id="exPartner" data-in="exPartner" placeholder="z. B. Muster IT-Partner GmbH" value="' + esc(e.partner) + '"></label>' +
       '<label class="field" for="exAuthor">Erstellt von<input class="input" id="exAuthor" data-in="exAuthor" placeholder="Name" value="' + esc(e.author) + '"></label></div>' : '') +
     '<button class="btn primary lg" data-act="doExport"' + (state.busy ? ' disabled' : '') + '>' + (state.busy ? 'Wird erzeugt …' : esc(FORMATS.find((f) => f[0] === e.format)[1]) + ' erzeugen') + '</button>' +
     (e.format === 'pdf' ? '<p class="small muted">Im Druckdialog als Ziel „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen.</p>' : '') +
@@ -508,6 +508,7 @@ function viewSettings() {
     '<section class="panel" style="max-width:760px"><h2>App-Registrierung</h2>' +
     '<label class="field" for="cfgClient">Anwendungs-ID (Client-ID)<input class="input mono" id="cfgClient" value="' + esc(state.cfg.clientId || '') + '"></label>' +
     '<label class="field" for="cfgTenant">Standard-Tenant (optional)<input class="input mono" id="cfgTenant" value="' + esc(state.cfg.defaultTenant || '') + '"></label>' +
+    '<label class="field" for="cfgBrand">Untertitel unter dem Logo (z. B. Firmen- oder Teamname)<input class="input" id="cfgBrand" placeholder="Intune-Dokumentation & Analyse" value="' + esc(state.cfg.brandLabel || '') + '"></label>' +
     '<div><button class="btn primary" data-act="saveSettings">Speichern</button></div>' +
     '<span class="sectlabel">Umleitungs-URI (SPA)</span><div class="copyrow"><code>' + esc(ru) + '</code><button class="btn" data-act="copy" data-text="' + esc(ru) + '">' + ICON.copy + 'Kopieren</button></div>' +
     '<span class="sectlabel">Benötigte Graph-Berechtigungen (delegiert)</span><div class="permlist">' + PERMS.map((p) => '<span class="chip mono">' + p + '</span>').join('') + '</div></section>' +
@@ -607,7 +608,7 @@ const ACTIONS = {
     const clientId = document.getElementById('cfgClient').value.trim();
     const defaultTenant = document.getElementById('cfgTenant').value.trim();
     if (!/^[0-9a-f-]{36}$/i.test(clientId)) { state.error = 'Bitte eine gültige Client-ID (GUID) eintragen.'; render(); return; }
-    state.cfg = await api('/api/config', { method: 'POST', body: JSON.stringify({ clientId, defaultTenant }) });
+    state.cfg = await api('/api/config', { method: 'POST', body: JSON.stringify({ clientId, defaultTenant, brandLabel: state.cfg.brandLabel || '' }) });
     state.error = '';
     state.screen = 'login';
     render();
@@ -616,8 +617,9 @@ const ACTIONS = {
     const clientId = document.getElementById('cfgClient').value.trim();
     const defaultTenant = document.getElementById('cfgTenant').value.trim();
     if (clientId && !/^[0-9a-f-]{36}$/i.test(clientId)) { toast('Ungültige Client-ID'); return; }
-    state.cfg = await api('/api/config', { method: 'POST', body: JSON.stringify({ clientId, defaultTenant }) });
-    toast('Gespeichert');
+    const brandLabel = document.getElementById('cfgBrand').value.trim();
+    state.cfg = await api('/api/config', { method: 'POST', body: JSON.stringify({ clientId, defaultTenant, brandLabel }) });
+    toast('Gespeichert'); render();
   },
   openSetup() { state.error = ''; state.screen = 'setup'; render(); },
   demo() { startDemo(); },

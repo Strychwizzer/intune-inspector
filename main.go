@@ -39,6 +39,7 @@ type Config struct {
 	ClientID      string `json:"clientId"`
 	DefaultTenant string `json:"defaultTenant"`
 	Port          int    `json:"port"`
+	BrandLabel    string `json:"brandLabel,omitempty"`
 }
 
 var (
@@ -222,9 +223,11 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 		}
 		c.ClientID = strings.TrimSpace(c.ClientID)
 		c.DefaultTenant = strings.TrimSpace(c.DefaultTenant)
+		old := loadConfig()
 		if c.Port == 0 {
-			c.Port = loadConfig().Port
+			c.Port = old.Port
 		}
+		c.BrandLabel = strings.TrimSpace(c.BrandLabel)
 		b, _ := json.MarshalIndent(c, "", "  ")
 		cfgMu.Lock()
 		err := os.WriteFile(cfgPath, b, 0o600)

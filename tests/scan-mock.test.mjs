@@ -87,3 +87,16 @@ console.log('devices', snap.devices.map(d=>d.name+'/'+d.platform+'/'+d.owner+'/'
 console.log('connectors', an.connectors);
 const m = X.buildModel(snap, an, { sections: new Set(X.SECTIONS.map(s => s[0])), notes: {} });
 console.log('md length', X.toMarkdown(m).length, 'html', X.toHtml(m).length, 'csv', X.toCsvSettings(m).split('\n').length);
+
+// ---- Prüfungen ----
+const assert = (await import('node:assert/strict')).default;
+assert.equal(snap.tenant.displayName, 'Kunde AG');
+assert.equal(snap.devices.length, 2, 'Geräte gelesen');
+assert.equal(snap.autopilot.length, 1, 'Autopilot-Geräte gelesen');
+assert.ok(snap.objects.some((o) => o.name === 'Catalog X'), 'Folgeseite (nextLink) wurde geladen');
+assert.ok(snap.objects.find((o) => o.name === 'Script').code[0].content.includes('Hallo Ä'), 'Skriptinhalt dekodiert (UTF-8)');
+assert.ok(snap.objects.find((o) => o.name === 'Firewall').assignments.some((x) => x.deletedGroup), 'gelöschte Gruppe erkannt');
+assert.ok(snap.objects.find((o) => o.name === 'ADMX').settings.length > 0, 'ADMX-Fallback ohne presentationValues');
+assert.ok(an.findings.some((f) => /abgelaufen/.test(f.title)), 'abgelaufenes ADE-Token gemeldet');
+assert.equal(an.connectors.length, 4, 'vier Plattform-Anbindungen');
+console.log('\nOK – Scan-Test gegen simulierte Graph-API bestanden');

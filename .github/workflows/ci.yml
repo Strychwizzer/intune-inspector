@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Go prüfen und bauen
+        run: |
+          test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+          go vet ./...
+          go build ./...
+      - name: JavaScript-Syntax prüfen
+        run: for f in web/js/*.js; do node --check "$f"; done
+      - name: Tests
+        working-directory: tests
+        run: |
+          node logic.test.mjs
+          node scan-mock.test.mjs

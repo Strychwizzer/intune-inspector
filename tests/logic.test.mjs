@@ -16,3 +16,13 @@ console.log(normalizeAssignment({runSchedule:{'@odata.type':'#microsoft.graph.de
 console.log(flattenProps({'@odata.type':'x',id:1,displayName:'a',passwordRequired:true,passwordMinimumLength:8,wifiPreSharedKey:'abc',x:'notConfigured',y:false,z:[], nested:{a:1,'@odata.type':'q'}}));
 console.log(deviceConfigCategory('#microsoft.graph.windowsUpdateForBusinessConfiguration'), deviceConfigCategory('#microsoft.graph.windows10CustomConfiguration'), deviceConfigCategory('#microsoft.graph.windows81SCEPCertificateProfile'), deviceConfigCategory('#microsoft.graph.windows10GeneralConfiguration'));
 console.log(catalogCategory({templateReference:{templateFamily:'endpointSecurityFirewall'}}), catalogCategory({templateReference:{templateFamily:'baseline',templateDisplayName:'Defender Baseline'}}));
+
+// ---- Prüfungen ----
+const assert = (await import('node:assert/strict')).default;
+assert.equal(a.conflicts.filter((c) => c.kind === 'conflict').length, 3, 'drei echte Konflikte im Demo-Mandanten');
+assert.equal(a.devices.total, 37, '37 Demo-Geräte');
+assert.ok(a.findings.some((f) => /Push-Zertifikat läuft in/.test(f.title)), 'APNs-Ablauf wird gemeldet');
+assert.equal(diffSnapshots(demoOlderSnapshot(), s).length, 5, 'fünf Unterschiede zum älteren Snapshot');
+assert.equal(flattenProps({ passwordRequired: true, wifiPreSharedKey: 'x' })[1].value, '(ausgeblendet)', 'Geheimnisse werden ausgeblendet');
+assert.equal(flattenProps({ passwordRequired: true })[0].value, 'Ja', 'passwordRequired bleibt sichtbar');
+console.log('\nOK – Logik-Tests bestanden');

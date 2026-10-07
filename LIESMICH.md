@@ -13,6 +13,8 @@ Das Programm startet einen kleinen Webserver, der **nur auf diesem Rechner** err
 3. Beim ersten Start die **Client-ID** der App-Registrierung eintragen (siehe unten).
 4. Kundentenant eingeben (Domain oder Tenant-ID), **Mit Microsoft anmelden**, fertig: Der Scan läuft automatisch.
 
+> **macOS / Linux:** `chmod +x IntuneInspector` und `./IntuneInspector` starten. macOS: beim ersten Start Rechtsklick → *Öffnen*.
+
 > **Windows SmartScreen:** Die Datei ist nicht signiert. Beim ersten Start ggf. *Weitere Informationen → Trotzdem ausführen* wählen, oder vorher Rechtsklick auf die ZIP → *Eigenschaften* → *Zulassen*.
 
 Ohne Tenant ausprobieren: Auf der Anmeldeseite **Demo mit Beispieldaten** wählen.
@@ -21,7 +23,7 @@ Ohne Tenant ausprobieren: Auf der Anmeldeseite **Demo mit Beispieldaten** wähle
 
 ## Einmalige Einrichtung: App-Registrierung
 
-Einmal anlegen, dann für alle Kunden nutzbar (z. B. im eigenen TD-SYNNEX- oder Partner-Tenant).
+Einmal anlegen, dann für alle Kunden nutzbar (z. B. im eigenen Partner-Tenant).
 
 1. **Entra Admin Center → Identität → Anwendungen → App-Registrierungen → Neue Registrierung**
    - Name: `Intune Inspector`
@@ -62,10 +64,10 @@ Beim ersten Login in einem Kundentenant muss einmal die **Administratorzustimmun
 Neben die `IntuneInspector.exe` eine Datei `config.json` legen:
 
 ```json
-{ "clientId": "00000000-0000-0000-0000-000000000000" }
+{ "clientId": "00000000-0000-0000-0000-000000000000", "brandLabel": "Name des Teams" }
 ```
 
-Sie wird beim ersten Start übernommen, die Einrichtungsseite entfällt dann.
+Sie wird beim ersten Start übernommen, die Einrichtungsseite entfällt dann. `brandLabel` (optional) ist der Untertitel unter dem Logo, z. B. der Name eures Teams.
 
 ---
 
@@ -145,4 +147,4 @@ IntuneInspector.exe -data D:\Doku   anderer Datenordner
 - Konflikterkennung vergleicht Einstellungen gleicher Herkunft (z. B. Settings Catalog untereinander). Eine Gegenüberstellung zwischen alten Vorlagen und Settings Catalog erfolgt nicht.
 - Enthaltene Bibliotheken: MSAL.js (MIT), docx (MIT), IBM Plex (OFL) – Lizenzen unter `web/vendor` bzw. `web/fonts` im Quellcode.
 
-Quellcode liegt im Ordner `quellcode` (Go + JavaScript). Neu bauen: `go build -o IntuneInspector.exe .`
+Quellcode, ausführliche Dokumentation und neue Versionen: https://github.com/Strychwizzer/intune-inspector

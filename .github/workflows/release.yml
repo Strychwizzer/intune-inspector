@@ -1,0 +1,41 @@
+name: Release
+
+# Wird durch ein Versions-Tag ausgelöst, z. B.:  git tag v1.1.0 && git push origin v1.1.0
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tests
+        working-directory: tests
+        run: |
+          node logic.test.mjs
+          node scan-mock.test.mjs
+      - name: Version aus Tag mit main.go abgleichen
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          CODE="$(sed -n 's/^const appVersion = "\(.*\)"/\1/p' main.go)"
+          if [ "$TAG" != "$CODE" ]; then echo "Tag v$TAG passt nicht zu appVersion $CODE in main.go"; exit 1; fi
+      - name: Bauen und packen
+        run: tools/package.sh "${GITHUB_REF_NAME#v}"
+      - name: Release erstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt

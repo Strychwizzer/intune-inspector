@@ -1,148 +1,112 @@
-# Intune Inspector 1.1
+<div align="center">
 
-Bestandsaufnahme und Dokumentation einer kompletten Microsoft-Intune-Umgebung – per Doppelklick, ohne PowerShell, ohne Installation.
+# Intune Inspector
 
-Das Programm startet einen kleinen Webserver, der **nur auf diesem Rechner** erreichbar ist (`http://localhost:8400`), und öffnet die Oberfläche im Standardbrowser. Die Anmeldung und alle Abfragen laufen direkt aus dem Browser gegen Microsoft Entra ID und Microsoft Graph. Es werden **ausschließlich lesende** Aufrufe gemacht, und es gehen keine Daten an Dritte.
+**Komplette Microsoft-Intune-Umgebung in wenigen Minuten erfassen, verstehen und dokumentieren.**
+Doppelklick, am Kundentenant anmelden, fertig – ohne PowerShell, ohne Installation, nur lesend.
+
+![Übersicht](docs/screenshots/03-uebersicht.png)
+
+</div>
 
 ---
+
+## Worum geht es?
+
+Bei einem IT-Dienstleisterwechsel, einer Übernahme oder einem Audit stellt sich oft dieselbe Frage: *Welche Intune-Richtlinien gibt es, was bewirken sie, und wer bekommt was?* Intune Inspector beantwortet das automatisch:
+
+- liest **alle** Intune-Konfigurationen eines Mandanten über Microsoft Graph – ausschließlich lesend,
+- bereitet sie einheitlich auf (Einstellungen, Zuweisungen, Filter, Skripte),
+- findet **Konflikte, Aufräum-Kandidaten und ablaufende Zertifikate**,
+- erfasst das **Geräteinventar** aller Plattformen inkl. Windows Autopilot,
+- und erzeugt per Klick eine **fertige Kundendokumentation** (Word, PDF, HTML, Markdown, Excel/CSV, JSON).
+
+Technisch ist es eine einzelne Programmdatei: Sie startet einen kleinen Webserver, der nur auf `localhost` erreichbar ist, und öffnet die Oberfläche im Browser. Anmeldung und Abfragen laufen direkt vom Browser zu Microsoft Entra ID und Microsoft Graph. Es gibt keinen Cloud-Dienst dazwischen, und es werden keine Daten an Dritte übertragen.
+
+## Funktionen im Überblick
+
+| | |
+| --- | --- |
+| **Vollständiger Read-only-Scan** | Settings Catalog, Konfigurationsprofile, ADMX, OMA-URI, Endpoint Security, Security Baselines, Compliance, Update-Ringe & Windows-Update-Profile, Apps, App-Schutz, App-Konfiguration, Skripte & Remediations, Enrollment & Autopilot, Filter, Scope Tags, Rollen – Details in [Datenumfang](docs/datenumfang.md) |
+| **Geräteinventar** | Windows, iOS/iPadOS, Android, macOS mit Version, Modell, Benutzer, Besitz, Konformität, Registrierungsart, Verschlüsselung, letztem Check-in – plus alle Windows-Autopilot-Geräte |
+| **Plattform-Anbindungen** | Apple MDM-Push-Zertifikat, ADE- und VPP-Token mit Restlaufzeit, Managed Google Play, Defender for Endpoint / MTD |
+| **Analyse** | Konflikte & Dubletten mit Bewertung der Gruppen-Überschneidung, Zuweisungen je Gruppe, nicht zugewiesene Objekte, Zuweisungen an gelöschte Gruppen, veraltete Objekte, nicht konforme oder inaktive Geräte |
+| **Snapshots & Vergleich** | Jeder Scan wird lokal gesichert; zwei Stände zeigen, was sich geändert hat |
+| **Doku auf Knopfdruck** | Word mit Titelseite, Inhaltsverzeichnis und Seitenzahlen, PDF, HTML, Markdown, CSV, JSON-Backup – mit Partner-Branding und eigenen Notizen je Objekt |
+| **Sicher by Design** | nur lesende Graph-Aufrufe, nur `localhost`, strikte Content-Security-Policy, Geheimnisse (Kennwörter, PSKs, Tokens) werden ausgeblendet |
+
+## Screenshots
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/04-geraete.png" alt="Geräteinventar"><br><sub><b>Geräteinventar</b> – alle Plattformen, Versionen, Registrierungsarten, Konformität</sub></td>
+<td width="50%"><img src="docs/screenshots/07-objekte-suche.png" alt="Suche über alle Einstellungen"><br><sub><b>Suche über alle Einstellungen</b> – z. B. „BitLocker“, mit Detailansicht</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/09-zuweisungen.png" alt="Zuweisungen nach Gruppe"><br><sub><b>Zuweisungen nach Gruppe</b> – wer bekommt was, inkl. gelöschter Gruppen</sub></td>
+<td><img src="docs/screenshots/10-konflikte.png" alt="Konflikte"><br><sub><b>Konflikte</b> – gleiche Einstellung, unterschiedliche Werte</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/08-objekt-skript.png" alt="Remediation mit Skriptinhalt"><br><sub><b>Skripte & Remediations</b> – inklusive Skriptinhalt und Zeitplan</sub></td>
+<td><img src="docs/screenshots/11-snapshot-vergleich.png" alt="Snapshot-Vergleich"><br><sub><b>Snapshot-Vergleich</b> – Änderungen zwischen zwei Scans</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/12-export.png" alt="Export"><br><sub><b>Doku-Export</b> – Format, Inhalt und Bereiche wählbar</sub></td>
+<td><img src="docs/screenshots/13-helles-design.png" alt="Helles Design"><br><sub><b>Helles Design</b> – umschaltbar</sub></td>
+</tr>
+</table>
+
+**Ergebnis – Word-Export (Auszug):**
+
+![Word-Export](docs/screenshots/15-word-export.png)
+
+Komplette Beispiel-Dokumente aus dem Demo-Mandanten: [Word](docs/beispiel/Beispiel-Dokumentation.docx) · [PDF](docs/beispiel/Beispiel-Dokumentation.pdf) · [HTML](docs/beispiel/Beispiel-Dokumentation.html) · [Markdown](docs/beispiel/Beispiel-Dokumentation.md)
 
 ## Schnellstart
 
-1. ZIP entpacken, z. B. nach `C:\Tools\IntuneInspector`.
-2. `IntuneInspector.exe` doppelklicken. Es öffnet sich ein Konsolenfenster (offen lassen) und der Browser.
-3. Beim ersten Start die **Client-ID** der App-Registrierung eintragen (siehe unten).
-4. Kundentenant eingeben (Domain oder Tenant-ID), **Mit Microsoft anmelden**, fertig: Der Scan läuft automatisch.
+1. Die passende Datei von der [Releases-Seite](../../releases) herunterladen und entpacken.
+2. `IntuneInspector.exe` doppelklicken (macOS/Linux: siehe [Einrichtung](docs/einrichtung.md#macos-und-linux)).
+3. Beim ersten Start die **Client-ID** einer App-Registrierung eintragen (einmalig, siehe unten).
+4. Kundentenant eingeben, **Mit Microsoft anmelden** – der Scan startet automatisch.
 
-> **Windows SmartScreen:** Die Datei ist nicht signiert. Beim ersten Start ggf. *Weitere Informationen → Trotzdem ausführen* wählen, oder vorher Rechtsklick auf die ZIP → *Eigenschaften* → *Zulassen*.
+> Ohne Tenant ausprobieren: Auf der Anmeldeseite **„Demo mit Beispieldaten“** wählen oder `http://localhost:8400/?demo` öffnen.
 
-Ohne Tenant ausprobieren: Auf der Anmeldeseite **Demo mit Beispieldaten** wählen.
+## Einmalige Einrichtung (Kurzfassung)
 
----
+1. In Entra ID eine **mehrinstanzenfähige** App-Registrierung anlegen.
+2. Plattform **Single-Page-Anwendung** mit der Umleitungs-URI `http://localhost:8400/redirect.html` hinzufügen.
+3. Diese **delegierten** Microsoft-Graph-Berechtigungen hinzufügen (alle nur lesend):
+   `DeviceManagementConfiguration.Read.All`, `DeviceManagementApps.Read.All`, `DeviceManagementServiceConfig.Read.All`, `DeviceManagementManagedDevices.Read.All`, `DeviceManagementRBAC.Read.All`, `DeviceManagementScripts.Read.All`, `Group.Read.All`, `User.Read`
+4. Im Kundentenant einmalig die **Administratorzustimmung** erteilen.
 
-## Einmalige Einrichtung: App-Registrierung
+Schritt für Schritt mit allen Details, GDAP-Hinweisen und Verteilung an Kollegen: **[docs/einrichtung.md](docs/einrichtung.md)**
 
-Einmal anlegen, dann für alle Kunden nutzbar (z. B. im eigenen TD-SYNNEX- oder Partner-Tenant).
+## Dokumentation
 
-1. **Entra Admin Center → Identität → Anwendungen → App-Registrierungen → Neue Registrierung**
-   - Name: `Intune Inspector`
-   - Unterstützte Kontotypen: **Konten in einem beliebigen Organisationsverzeichnis (mehrinstanzenfähig)**
-2. **Authentifizierung → Plattform hinzufügen → Single-Page-Anwendung (SPA)**
-   - Umleitungs-URI: `http://localhost:8400/redirect.html`
-   - Wichtig: als *SPA*, nicht als *Web*.
-3. **API-Berechtigungen → Berechtigung hinzufügen → Microsoft Graph → Delegierte Berechtigungen**:
-
-   | Berechtigung | Wofür |
-   | --- | --- |
-   | DeviceManagementConfiguration.Read.All | Konfigurationsprofile, Settings Catalog, Endpoint Security, Baselines, Compliance, Updates |
-   | DeviceManagementApps.Read.All | Apps, App-Schutz, App-Konfiguration |
-   | DeviceManagementServiceConfig.Read.All | Enrollment, Autopilot, ESP, Filter, Nutzungsbedingungen, Branding |
-   | DeviceManagementManagedDevices.Read.All | geräte­bezogene Einstellungen, Kategorien |
-   | DeviceManagementRBAC.Read.All | Intune-Rollen, Bereichsmarkierungen |
-   | DeviceManagementScripts.Read.All | PowerShell-/Shell-Skripte, Remediations, Compliance-Skripte |
-   | Group.Read.All | Gruppennamen der Zuweisungen auflösen |
-   | User.Read | Anmeldung, Mandantenname |
-
-4. Die **Anwendungs-ID (Client-ID)** von der Übersichtsseite kopieren und beim ersten Start im Intune Inspector eintragen.
-
-### Zustimmung im Kundentenant
-
-Beim ersten Login in einem Kundentenant muss einmal die **Administratorzustimmung** erteilt werden. Das geht auf zwei Wegen:
-
-- Ein Administrator des Kunden meldet sich an und setzt im Zustimmungsdialog den Haken *Im Namen Ihrer Organisation zustimmen*.
-- Oder direkt per Link (Tenant und Client-ID einsetzen):
-  `https://login.microsoftonline.com/<KUNDENTENANT>/adminconsent?client_id=<CLIENT-ID>`
-
-### Zugriff über GDAP (Partner)
-
-- Auf der Anmeldeseite **immer den Kundentenant** angeben, sonst landet die Anmeldung im eigenen Tenant.
-- Benötigte GDAP-Rollen für das Lesen: z. B. **Intune-Administrator** oder **Globaler Leser** (lesend reicht). Für die einmalige Zustimmung zusätzlich **Cloudanwendungsadministrator**, oder der Kunde stimmt selbst zu.
-
-### Client-ID an Kollegen verteilen
-
-Neben die `IntuneInspector.exe` eine Datei `config.json` legen:
-
-```json
-{ "clientId": "00000000-0000-0000-0000-000000000000" }
-```
-
-Sie wird beim ersten Start übernommen, die Einrichtungsseite entfällt dann.
-
----
-
-## Was gelesen und dokumentiert wird
-
-| Bereich | Inhalt |
+| Dokument | Inhalt |
 | --- | --- |
-| Konfiguration | Settings Catalog, Konfigurationsprofile (Vorlagen), Administrative Vorlagen (ADMX) inkl. Werte, Benutzerdefiniert (OMA-URI), WLAN, VPN, Zertifikate, E-Mail, Kiosk, Domänenbeitritt u. a. |
-| Endpoint Security | Antivirus, Firewall, Datenträgerverschlüsselung, EDR, Angriffsflächenreduzierung, Kontoschutz, App-Steuerung, EPM – neue und ältere Vorlagen |
-| Security Baselines | alle Baselines (Windows, Defender, Edge, M365 Apps) |
-| Compliance | Compliance-Richtlinien inkl. Aktionen bei Nichtkonformität, Settings-Catalog-Compliance, Compliance-Skripte, Mandanteneinstellungen |
-| Windows Updates | Update-Ringe, Feature-Updates, Quality-Updates (beschleunigt), Treiber-Updates, Apple-Update-Richtlinien |
-| Apps | alle zugewiesenen Apps mit Absicht (erforderlich, verfügbar, deinstallieren), Installationsbefehlen, Erkennungsregeln (inkl. Skript), Benachrichtigungen, Stichtagen |
-| App-Schutz / App-Konfiguration | iOS, Android, Windows (Edge); verwaltete Geräte und verwaltete Apps |
-| Skripte & Remediations | PowerShell, macOS-Shell, benutzerdefinierte Attribute, Remediations inkl. **Skriptinhalt** und Zeitplan |
-| Enrollment | Autopilot-Profile, Enrollment Status Page, Registrierungseinschränkungen, Gerätelimit, Windows Hello for Business, Android Enterprise-Profile, Autopilot Device Preparation |
-| Mandant & Verwaltung | Zuweisungsfilter (mit Regel), Scope Tags, Intune-Rollen inkl. Zuweisungen, Gerätekategorien, Nutzungsbedingungen, Branding, Benachrichtigungsvorlagen |
-| Plattform-Anbindungen | Apple MDM-Push-Zertifikat (APNs) mit Apple-ID und Ablaufdatum, Apple ADE-Token (Business/School Manager) inkl. Registrierungsprofilen, Apple VPP-Token, Managed Google Play, Mobile Threat Defense / Defender for Endpoint, Geräteverwaltungs-Partner |
-| Geräteinventar | alle verwalteten Geräte – **Windows, iOS/iPadOS, Android, macOS** – mit OS-Version, Modell, Seriennummer, Benutzer, Besitz (Firma/privat), Konformität, Registrierungsart, Join-Typ, Verschlüsselung, Supervised/Jailbreak, letztem Check-in; dazu alle **Windows-Autopilot-Geräte** mit Group Tag und Profilstatus |
+| [Einrichtung](docs/einrichtung.md) | App-Registrierung, Zustimmung, GDAP, Verteilung, Startoptionen, macOS/Linux |
+| [Bedienung](docs/bedienung.md) | Rundgang durch alle Ansichten mit Screenshots |
+| [Datenumfang](docs/datenumfang.md) | Was genau gelesen wird – Bereiche, Graph-Endpunkte, Berechtigungen |
+| [Export](docs/export.md) | Formate, Abschnitte, Datenschutz bei der Geräteliste |
+| [Sicherheit & Datenschutz](docs/sicherheit-datenschutz.md) | Architektur, Schutzmaßnahmen, Ablage, personenbezogene Daten |
+| [Fehlerbehebung](docs/fehlerbehebung.md) | AADSTS-Fehler, Berechtigungen, Pop-ups, Ports |
+| [Entwicklung](docs/entwicklung.md) | Aufbau des Codes, bauen, testen, Screenshots, Releases |
+| [Veröffentlichung](docs/veroeffentlichung.md) | Checkliste vor dem öffentlichen Release |
+| [Änderungen](CHANGELOG.md) | Versionshistorie |
 
-Zu jedem Objekt: alle konfigurierten Einstellungen, Zuweisungen (eingeschlossen/ausgeschlossen, Filter, Absicht), Bereichsmarkierungen, Erstell- und Änderungsdatum. Geheime Werte (Kennwörter, Pre-Shared Keys, Tokens) werden ausgeblendet.
+## Systemvoraussetzungen
 
-### Auswertungen
+- Windows 10/11 (x64 oder ARM64), macOS 12+ (Apple Silicon oder Intel) oder Linux x64
+- aktueller Browser (Edge, Chrome, Firefox, Safari)
+- Konto mit Leserechten in Intune im Zielmandanten (z. B. *Globaler Leser* oder *Intune-Administrator*, auch per GDAP)
 
-- **Übersicht** mit Kennzahlen und Befunden
-- **Konflikte & Dubletten:** gleiche Einstellung in mehreren zugewiesenen Richtlinien mit unterschiedlichen bzw. gleichen Werten, mit Bewertung, ob sich die Zielgruppen überschneiden
-- **Zuweisungen nach Gruppe:** was bekommt welche Gruppe (inkl. Alle Geräte/Alle Benutzer)
-- **Ablaufdaten:** APNs-, ADE- und VPP-Token mit Restlaufzeit; Warnung ab 60 Tagen, kritisch ab 30 Tagen bzw. bei Ablauf
-- **Geräte:** Kennzahlen je Plattform, Versionsverteilung, Registrierungsarten; Befunde zu nicht konformen, unverschlüsselten, gerooteten und seit über 30 Tagen inaktiven Geräten sowie Autopilot-Geräten ohne Profil
-- **Aufräum-Kandidaten:** nicht zugewiesen, Zuweisung an gelöschte Gruppen, Ein- und Ausschluss derselben Gruppe, doppelte Namen, seit über 12 Monaten unverändert
-- **Snapshots & Vergleich:** jeder Scan wird lokal gespeichert; zwei Stände vergleichen zeigt neue, geänderte, entfernte Objekte und geänderte Zuweisungen
-- **Notizen** je Objekt, die in die Doku übernommen werden
+## Status
 
-### Exporte
+Version 1.1. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine simulierte Graph-API getestet. **Ein Test gegen einen echten Mandanten steht noch aus** – siehe [Veröffentlichungs-Checkliste](docs/veroeffentlichung.md).
 
-Word (.docx mit Titelseite, Inhaltsverzeichnis, Seitenzahlen), PDF (über den Druckdialog), HTML-Bericht, Markdown, Excel-taugliche CSV (Einstellungen, Zuweisungen bzw. Geräte inkl. Autopilot) und JSON-Backup.
+## Lizenz
 
-**Datenschutz:** Die Geräteliste mit Gerätenamen, Benutzern und Seriennummern ist im Export standardmäßig **abgewählt** – die Doku enthält dann nur zusammengefasste Zahlen. Bei Bedarf unter *Inhalt* aktivieren. Inhalt und Bereiche sind wählbar, Partnername und Autor erscheinen auf der Titelseite.
+Noch nicht festgelegt – siehe [Veröffentlichung](docs/veroeffentlichung.md#lizenz). Enthaltene Fremdkomponenten und deren Lizenzen: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
----
-
-## Ablage
-
-Alles liegt im Ordner **`IntuneInspector-Daten`** neben der Programmdatei:
-
-- `config.json` – Client-ID und Standard-Tenant
-- `snapshots\` – ein JSON pro Scan (entfernte landen in `snapshots\_entfernt`)
-- `notes\` – Notizen je Mandant
-
-Die Snapshots enthalten die komplette Konfiguration des Kunden. Bitte entsprechend vertraulich behandeln.
-
----
-
-## Optionen
-
-```
-IntuneInspector.exe -port 8401      anderer Port (dann auch die Umleitungs-URI anpassen)
-IntuneInspector.exe -no-browser     Browser nicht automatisch öffnen
-IntuneInspector.exe -data D:\Doku   anderer Datenordner
-```
-
-## Fehlerbehebung
-
-| Meldung | Lösung |
-| --- | --- |
-| AADSTS50011 (Umleitungs-URI) | `http://localhost:8400/redirect.html` als **SPA** eintragen |
-| AADSTS9002326 / Cross-origin | URI ist als *Web* statt *SPA* registriert |
-| AADSTS700016 | App nicht mehrinstanzenfähig oder falsche Client-ID |
-| AADSTS65001 / Zustimmung | Administratorzustimmung im Kundentenant erteilen (Link oben) |
-| Pop-up blockiert | Pop-ups für `localhost` erlauben |
-| „Keine Berechtigung (403)“ im Scan-Protokoll | Graph-Berechtigung fehlt oder Zustimmung veraltet (nach Hinzufügen neuer Rechte erneut zustimmen) bzw. Konto ohne Intune-Rolle |
-| Port belegt | Läuft das Programm schon? Sonst `-port` nutzen |
-
-## Hinweise
-
-- Verwendet die Microsoft-Graph-**beta**-Schnittstelle, wie das Intune-Portal selbst. Microsoft kann dort Felder ändern; einzelne Bereiche erscheinen dann ggf. im Scan-Protokoll als nicht lesbar, der Rest läuft weiter.
-- Konflikterkennung vergleicht Einstellungen gleicher Herkunft (z. B. Settings Catalog untereinander). Eine Gegenüberstellung zwischen alten Vorlagen und Settings Catalog erfolgt nicht.
-- Enthaltene Bibliotheken: MSAL.js (MIT), docx (MIT), IBM Plex (OFL) – Lizenzen unter `web/vendor` bzw. `web/fonts` im Quellcode.
-
-Quellcode liegt im Ordner `quellcode` (Go + JavaScript). Neu bauen: `go build -o IntuneInspector.exe .`
+Microsoft, Intune, Entra und Windows sind Marken der Microsoft-Unternehmensgruppe. Dieses Projekt steht in keiner Verbindung zu Microsoft.
