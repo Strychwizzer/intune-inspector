@@ -1,0 +1,7 @@
+# Lokale Daten (Konfiguration, Snapshots mit Kundendaten, Notizen) niemals einchecken
+IntuneInspector-Daten/
+config.json
+# Build-Ergebnisse
+/dist/
+*.exe
+IntuneInspector-*
