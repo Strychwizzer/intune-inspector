@@ -1,6 +1,7 @@
 // Auswertung eines Snapshots: Kennzahlen, Befunde, Konflikte, Zuweisungsindex, Vergleich.
 import { AREAS } from './normalize.js';
 import { analyzeDevices, analyzeConnectors } from './devices.js';
+import { T, tv } from './i18n.js';
 
 const DAY = 86400000;
 
@@ -32,15 +33,15 @@ export function analyze(snap) {
 
   const findings = [];
   const realConflicts = conflicts.filter((c) => c.kind === 'conflict');
-  if (realConflicts.length) findings.push({ sev: 'high', title: realConflicts.length + ' Einstellung(en) mit widersprüchlichen Werten', text: 'Dieselbe Einstellung wird von mehreren zugewiesenen Richtlinien unterschiedlich gesetzt.', view: 'conflicts' });
-  if (deletedGroupRefs.length) findings.push({ sev: 'high', title: deletedGroupRefs.length + ' Objekt(e) mit Zuweisung an gelöschte Gruppen', text: 'Zuweisungen zeigen auf Gruppen, die es in Entra ID nicht mehr gibt.', view: 'policies', filter: 'deletedgroup' });
-  if (includedAndExcluded.length) findings.push({ sev: 'medium', title: includedAndExcluded.length + ' Objekt(e) schließen dieselbe Gruppe ein und aus', text: 'Ausschluss hat Vorrang – die Einschluss-Zuweisung ist wirkungslos.', view: 'policies', filter: 'inexclude' });
-  if (unassigned.length) findings.push({ sev: 'medium', title: unassigned.length + ' Objekt(e) ohne Zuweisung', text: 'Kandidaten zum Aufräumen oder vergessene Tests.', view: 'policies', filter: 'unassigned' });
-  if (duplicates.length) findings.push({ sev: 'low', title: duplicates.length + ' doppelte Namen', text: 'Mehrere Objekte heißen gleich, das erschwert die Pflege.', view: 'policies', filter: 'dupname' });
-  if (stale.length) findings.push({ sev: 'info', title: stale.length + ' Objekt(e) seit über 12 Monaten unverändert', text: 'Fachlich prüfen, ob sie noch gebraucht werden.', view: 'policies', filter: 'stale' });
+  if (realConflicts.length) findings.push({ sev: 'high', title: T(realConflicts.length + ' Einstellung(en) mit widersprüchlichen Werten', realConflicts.length + ' setting(s) with contradicting values'), text: T('Dieselbe Einstellung wird von mehreren zugewiesenen Richtlinien unterschiedlich gesetzt.', 'The same setting is configured differently by several assigned policies.'), view: 'conflicts' });
+  if (deletedGroupRefs.length) findings.push({ sev: 'high', title: T(deletedGroupRefs.length + ' Objekt(e) mit Zuweisung an gelöschte Gruppen', deletedGroupRefs.length + ' object(s) assigned to deleted groups'), text: T('Zuweisungen zeigen auf Gruppen, die es in Entra ID nicht mehr gibt.', 'Assignments point to groups that no longer exist in Entra ID.'), view: 'objects', filter: 'deletedgroup' });
+  if (includedAndExcluded.length) findings.push({ sev: 'medium', title: T(includedAndExcluded.length + ' Objekt(e) schließen dieselbe Gruppe ein und aus', includedAndExcluded.length + ' object(s) include and exclude the same group'), text: T('Ausschluss hat Vorrang – die Einschluss-Zuweisung ist wirkungslos.', 'Exclusion wins – the include assignment has no effect.'), view: 'objects', filter: 'inexclude' });
+  if (unassigned.length) findings.push({ sev: 'medium', title: T(unassigned.length + ' Objekt(e) ohne Zuweisung', unassigned.length + ' unassigned object(s)'), text: T('Kandidaten zum Aufräumen oder vergessene Tests.', 'Clean-up candidates or forgotten tests.'), view: 'objects', filter: 'unassigned' });
+  if (duplicates.length) findings.push({ sev: 'low', title: T(duplicates.length + ' doppelte Namen', duplicates.length + ' duplicate names'), text: T('Mehrere Objekte heißen gleich, das erschwert die Pflege.', 'Several objects share the same name, which makes maintenance harder.'), view: 'objects', filter: 'dupname' });
+  if (stale.length) findings.push({ sev: 'info', title: T(stale.length + ' Objekt(e) seit über 12 Monaten unverändert', stale.length + ' object(s) unchanged for over 12 months'), text: T('Fachlich prüfen, ob sie noch gebraucht werden.', 'Check whether they are still needed.'), view: 'objects', filter: 'stale' });
   const dupSettings = conflicts.filter((c) => c.kind === 'duplicate');
-  if (dupSettings.length) findings.push({ sev: 'low', title: dupSettings.length + ' Einstellung(en) mehrfach mit gleichem Wert gesetzt', text: 'Kein Widerspruch, aber Redundanz.', view: 'conflicts' });
-  if (assignable.length) findings.push({ sev: 'info', title: Math.round(withDesc.length / assignable.length * 100) + ' % der Objekte haben eine Beschreibung', text: 'Beschreibungen in Intune oder Notizen hier verbessern die Doku.', view: 'policies' });
+  if (dupSettings.length) findings.push({ sev: 'low', title: T(dupSettings.length + ' Einstellung(en) mehrfach mit gleichem Wert gesetzt', dupSettings.length + ' setting(s) configured several times with the same value'), text: T('Kein Widerspruch, aber Redundanz.', 'No contradiction, but redundant.'), view: 'conflicts' });
+  if (assignable.length) findings.push({ sev: 'info', title: T(Math.round(withDesc.length / assignable.length * 100) + ' % der Objekte haben eine Beschreibung', Math.round(withDesc.length / assignable.length * 100) + ' % of objects have a description'), text: T('Beschreibungen in Intune oder Notizen hier verbessern die Doku.', 'Descriptions in Intune or notes here improve the documentation.'), view: 'objects' });
 
   const dev = analyzeDevices(snap.devices || [], snap.autopilot || [], now);
   const conn = analyzeConnectors(objs, snap.devices || [], now);
@@ -144,23 +145,23 @@ export function diffSnapshots(oldSnap, newSnap) {
   const out = [];
   for (const [uid, n] of newMap) {
     const o = oldMap.get(uid);
-    if (!o) { out.push({ kind: 'Neu', uid, name: n.name, area: n.area, category: n.category, details: [n.settings.length + ' Einstellungen, ' + n.assignments.length + ' Zuweisungen'] }); continue; }
+    if (!o) { out.push({ kind: 'Neu', uid, name: n.name, area: n.area, category: n.category, details: [T(n.settings.length + ' Einstellungen, ' + n.assignments.length + ' Zuweisungen', n.settings.length + ' settings, ' + n.assignments.length + ' assignments')] }); continue; }
     const details = [];
-    if (o.name !== n.name) details.push('Name: „' + o.name + '“ → „' + n.name + '“');
-    if ((o.description || '') !== (n.description || '')) details.push('Beschreibung geändert');
+    if (o.name !== n.name) details.push(T('Name: „' + o.name + '“ → „' + n.name + '“', 'Name: “' + o.name + '” → “' + n.name + '”'));
+    if ((o.description || '') !== (n.description || '')) details.push(T('Beschreibung geändert', 'Description changed'));
     const os = new Map(o.settings.map((s) => [s.key + '|' + s.label, s.value]));
     const ns = new Map(n.settings.map((s) => [s.key + '|' + s.label, s.value]));
     for (const [k, v] of ns) {
       const label = k.split('|').slice(1).join('|');
-      if (!os.has(k)) details.push('+ ' + label + ' = ' + v);
-      else if (os.get(k) !== v) details.push(label + ': ' + os.get(k) + ' → ' + v);
+      if (!os.has(k)) details.push('+ ' + tv(label) + ' = ' + tv(v));
+      else if (os.get(k) !== v) details.push(tv(label) + ': ' + tv(os.get(k)) + ' → ' + tv(v));
     }
-    for (const [k, v] of os) if (!ns.has(k)) details.push('− ' + k.split('|').slice(1).join('|') + ' (war ' + v + ')');
-    const aKey = (a) => a.mode + ':' + a.label + (a.filterName ? ' [' + a.filterMode + ' ' + a.filterName + ']' : '') + (a.intent ? ' (' + a.intent + ')' : '');
+    for (const [k, v] of os) if (!ns.has(k)) details.push('− ' + tv(k.split('|').slice(1).join('|')) + T(' (war ', ' (was ') + tv(v) + ')');
+    const aKey = (a) => a.mode + ':' + tv(a.label) + (a.filterName ? ' [' + a.filterMode + ' ' + a.filterName + ']' : '') + (a.intent ? ' (' + tv(a.intent) + ')' : '');
     const oa = new Set(o.assignments.map(aKey)), na = new Set(n.assignments.map(aKey));
     const assignChanges = [];
-    for (const a of na) if (!oa.has(a)) assignChanges.push('+ Zuweisung ' + a.replace(/^include:/, '').replace(/^exclude:/, 'Ausschluss '));
-    for (const a of oa) if (!na.has(a)) assignChanges.push('− Zuweisung ' + a.replace(/^include:/, '').replace(/^exclude:/, 'Ausschluss '));
+    for (const a of na) if (!oa.has(a)) assignChanges.push(T('+ Zuweisung ', '+ Assignment ') + a.replace(/^include:/, '').replace(/^exclude:/, T('Ausschluss ', 'exclusion ')));
+    for (const a of oa) if (!na.has(a)) assignChanges.push(T('− Zuweisung ', '− Assignment ') + a.replace(/^include:/, '').replace(/^exclude:/, T('Ausschluss ', 'exclusion ')));
     if (details.length || assignChanges.length) out.push({ kind: details.length ? 'Geändert' : 'Zuweisung', uid, name: n.name, area: n.area, category: n.category, details: details.concat(assignChanges) });
   }
   for (const [uid, o] of oldMap) if (!newMap.has(uid)) out.push({ kind: 'Entfernt', uid, name: o.name, area: o.area, category: o.category, details: [] });

@@ -4,6 +4,7 @@ import {
   baseObject, flattenProps, flattenCatalog, normalizeAssignment, catalogCategory, deviceConfigCategory,
   appCategory, enrollmentCategory, platformFromType, platformFromField, decodeB64, fmtValue, humanize, shortType
 } from './normalize.js';
+import { T } from './i18n.js';
 import { DEVICE_SELECT, normalizeDevice, normalizeAutopilot, apnsObject, adeObject, adeProfileObject, vppObject, mgpObject, mtdObject, partnerObject } from './devices.js';
 
 const DM = '/deviceManagement';
@@ -128,11 +129,11 @@ export async function scanTenant(onProgress) {
       continue;
     }
     let items = res.items || [];
-    if (src.kind === 'devices') { devices = items.map(normalizeDevice); raw[src.key] = devices.length; log(src.key, src.label, 'done', devices.length + ' Geräte'); continue; }
-    if (src.kind === 'apdevices') { autopilot = items.map(normalizeAutopilot); raw[src.key] = autopilot.length; log(src.key, src.label, 'done', autopilot.length + ' Geräte'); continue; }
+    if (src.kind === 'devices') { devices = items.map(normalizeDevice); raw[src.key] = devices.length; log(src.key, src.label, 'done', devices.length + T(' Geräte', ' devices')); continue; }
+    if (src.kind === 'apdevices') { autopilot = items.map(normalizeAutopilot); raw[src.key] = autopilot.length; log(src.key, src.label, 'done', autopilot.length + T(' Geräte', ' devices')); continue; }
     if (src.kind === 'mtd') items = items.filter((c) => c.partnerState && c.partnerState !== 'notSetUp');
     if (src.kind === 'partner') items = items.filter((p) => p.isConfigured === true || (p.partnerState && !['unknown', 'unavailable', 'notSetUp', 'notConfigured'].includes(p.partnerState)));
-    if (res.notConfigured) { raw[src.key] = 0; log(src.key, src.label, 'done', 'nicht eingerichtet'); continue; }
+    if (res.notConfigured) { raw[src.key] = 0; log(src.key, src.label, 'done', T('nicht eingerichtet', 'not set up')); continue; }
     if (src.kind === 'role') items = items.filter((r) => !r.isBuiltIn || (r.roleAssignments && r.roleAssignments.length));
     if (src.kind === 'notification') { /* alle */ }
 
@@ -150,7 +151,7 @@ export async function scanTenant(onProgress) {
       if (!res.expanded && src.expand && src.expand.includes('assignments') && src.assignable !== false) want(it, base + '/assignments', 'assignments');
     }
     if (paths.length) {
-      log(src.key, src.label, 'running', items.length + ' Objekte, lade Details …');
+      log(src.key, src.label, 'running', items.length + T(' Objekte, lade Details …', ' objects, loading details …'));
       const results = await batchGet(paths);
       for (const [p, r] of results) {
         const [item, k] = byPath.get(p);
@@ -186,7 +187,7 @@ export async function scanTenant(onProgress) {
       } catch (e) { warnings.push({ source: src.label, message: 'Aufbereitung fehlgeschlagen für „' + (it.displayName || it.name || it.id) + '“: ' + e.message }); }
     }
     raw[src.key] = items.length;
-    log(src.key, src.label, 'done', items.length + (items.length === 1 ? ' Objekt' : ' Objekte'));
+    log(src.key, src.label, 'done', items.length + (items.length === 1 ? T(' Objekt', ' object') : T(' Objekte', ' objects')));
   }
 
   // Namen auflösen: Gruppen, Filter, Scope Tags
@@ -211,7 +212,7 @@ export async function scanTenant(onProgress) {
     }
   }
   for (const o of objects) finishObject(o, groups, filters, scopeTags);
-  log('resolve', 'Gruppen, Filter und Bereichsmarkierungen auflösen', 'done', Object.keys(groups).length + ' Gruppen');
+  log('resolve', 'Gruppen, Filter und Bereichsmarkierungen auflösen', 'done', Object.keys(groups).length + T(' Gruppen', ' groups'));
 
   return {
     app: 'Intune Inspector',

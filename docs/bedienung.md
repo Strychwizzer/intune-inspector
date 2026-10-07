@@ -89,6 +89,14 @@ Format, Inhalt und Bereiche wählen, Kunde/Partner/Autor eintragen, erzeugen. De
 
 ![Helles Design](screenshots/13-helles-design.png)
 
+## Sprache
+
+Die Oberfläche gibt es auf **Deutsch und Englisch**. Umschalten über die Schaltfläche **EN/DE** in der Kopfzeile, auf der Anmeldeseite oder unter *Einstellungen*. Beim ersten Start richtet sich die Sprache nach dem Browser; die Wahl wird gemerkt. Direktaufruf: `http://localhost:8400/?lang=en`.
+
+Übersetzt werden alle Texte des Tools, Bereiche, Kategorien, Befunde und Vergleiche. **Nicht** übersetzt werden Inhalte aus dem Mandanten – Richtliniennamen, Beschreibungen, Gruppennamen – sowie die Namen der Einstellungen, die Microsoft Graph liefert (meist englisch).
+
+![English interface](screenshots/en/03-overview.png)
+
 ## Tastatur
 
 | Taste | Wirkung |

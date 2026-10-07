@@ -3,6 +3,9 @@
 # Intune Inspector
 
 **Komplette Microsoft-Intune-Umgebung in wenigen Minuten erfassen, verstehen und dokumentieren.**
+
+🇩🇪 Deutsch · 🇬🇧 [English](README.en.md)
+
 Doppelklick, am Kundentenant anmelden, fertig – ohne PowerShell, ohne Installation, nur lesend.
 
 ![Übersicht](docs/screenshots/03-uebersicht.png)
@@ -33,6 +36,7 @@ Technisch ist es eine einzelne Programmdatei: Sie startet einen kleinen Webserve
 | **Analyse** | Konflikte & Dubletten mit Bewertung der Gruppen-Überschneidung, Zuweisungen je Gruppe, nicht zugewiesene Objekte, Zuweisungen an gelöschte Gruppen, veraltete Objekte, nicht konforme oder inaktive Geräte |
 | **Snapshots & Vergleich** | Jeder Scan wird lokal gesichert; zwei Stände zeigen, was sich geändert hat |
 | **Doku auf Knopfdruck** | Word mit Titelseite, Inhaltsverzeichnis und Seitenzahlen, PDF, HTML, Markdown, CSV, JSON-Backup – mit Partner-Branding und eigenen Notizen je Objekt |
+| **Deutsch & Englisch** | Oberfläche per Klick umschaltbar; die Doku lässt sich unabhängig davon auf Deutsch oder Englisch erzeugen |
 | **Sicher by Design** | nur lesende Graph-Aufrufe, nur `localhost`, strikte Content-Security-Policy, Geheimnisse (Kennwörter, PSKs, Tokens) werden ausgeblendet |
 
 ## Screenshots
@@ -61,6 +65,7 @@ Technisch ist es eine einzelne Programmdatei: Sie startet einen kleinen Webserve
 ![Word-Export](docs/screenshots/15-word-export.png)
 
 Komplette Beispiel-Dokumente aus dem Demo-Mandanten: [Word](docs/beispiel/Beispiel-Dokumentation.docx) · [PDF](docs/beispiel/Beispiel-Dokumentation.pdf) · [HTML](docs/beispiel/Beispiel-Dokumentation.html) · [Markdown](docs/beispiel/Beispiel-Dokumentation.md)
+Englische Fassung: [Word](docs/sample/Sample-Documentation.docx) · [PDF](docs/sample/Sample-Documentation.pdf) · [HTML](docs/sample/Sample-Documentation.html) · [Markdown](docs/sample/Sample-Documentation.md)
 
 ## Schnellstart
 
@@ -103,7 +108,7 @@ Schritt für Schritt mit allen Details, GDAP-Hinweisen und Verteilung an Kollege
 
 ## Status
 
-Version 1.1. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine simulierte Graph-API getestet. **Ein Test gegen einen echten Mandanten steht noch aus** – siehe [Veröffentlichungs-Checkliste](docs/veroeffentlichung.md).
+Version 1.2. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine simulierte Graph-API getestet. **Ein Test gegen einen echten Mandanten steht noch aus** – siehe [Veröffentlichungs-Checkliste](docs/veroeffentlichung.md).
 
 ## Lizenz
 

@@ -33,7 +33,7 @@ import (
 //go:embed web
 var webFS embed.FS
 
-const appVersion = "1.1.0"
+const appVersion = "1.2.0"
 
 type Config struct {
 	ClientID      string `json:"clientId"`

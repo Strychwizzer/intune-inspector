@@ -85,7 +85,7 @@ console.log('findings', an.findings.map(f => f.title));
 console.log('batchCalls', batchCalls);
 console.log('devices', snap.devices.map(d=>d.name+'/'+d.platform+'/'+d.owner+'/'+d.compliance), 'autopilot', snap.autopilot);
 console.log('connectors', an.connectors);
-const m = X.buildModel(snap, an, { sections: new Set(X.SECTIONS.map(s => s[0])), notes: {} });
+const m = X.buildModel(snap, an, { sections: new Set(X.SECTIONS.map(s => s.key)), notes: {} });
 console.log('md length', X.toMarkdown(m).length, 'html', X.toHtml(m).length, 'csv', X.toCsvSettings(m).split('\n').length);
 
 // ---- Prüfungen ----
@@ -100,3 +100,14 @@ assert.ok(snap.objects.find((o) => o.name === 'ADMX').settings.length > 0, 'ADMX
 assert.ok(an.findings.some((f) => /abgelaufen/.test(f.title)), 'abgelaufenes ADE-Token gemeldet');
 assert.equal(an.connectors.length, 4, 'vier Plattform-Anbindungen');
 console.log('\nOK – Scan-Test gegen simulierte Graph-API bestanden');
+
+// ---- Englische Ausgabe der echten Scanner-Daten ----
+const { withLang } = await import('../web/js/i18n.js');
+const enMd = withLang('en', () => { const an2 = analyze(snap); const m2 = X.buildModel(snap, an2, { sections: new Set(X.SECTIONS.map((s) => s.key)), notes: {} }); return X.toMarkdown(m2) + X.toCsvSettings(m2) + X.toCsvDevices(m2); });
+let scrubbed = enMd;
+for (const n of [...new Set(snap.objects.map((o) => o.name).concat(snap.devices.map((d) => d.name), Object.values(snap.groups).map((g) => g.name), ['Kunde AG', 'Nur Firmengeräte', 'GRP-Zwei', 'Makros blockieren'].concat(snap.objects.flatMap((o) => o.code.map((c) => c.content)))))].filter(Boolean)) scrubbed = scrubbed.split(n).join('<DATA>');
+const GERMAN = /[äöüÄÖÜß]|\b(und|oder|nicht|mit|ohne|für|Einstellung\w*|Zuweisung\w*|Gerät\w*|Objekt\w*|Ja|Nein|Mandant\w*|Benutzer|Firma|Privat|Aktiviert|Deaktiviert|Gültig|Konform\w*|Registr\w*|Verwalt\w*|Mitglieder|Bereich)\b/;
+const left = [...new Set(scrubbed.split(/[\n|,;]/).map((c) => c.trim()).filter((c) => c && GERMAN.test(c) && !c.includes('<DATA>')))];
+if (left.length) console.log('Deutsche Reste (EN):', left.slice(0, 40));
+assert.equal(left.length, 0, 'EN-Ausgabe der Scannerdaten enthält deutsche Texte');
+console.log('OK – englische Ausgabe der Scannerdaten geprüft');

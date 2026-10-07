@@ -1,13 +1,14 @@
 # Intune-Dokumentation – Demo-Kunde GmbH
 
-- Mandant: demokunde.onmicrosoft.com (00000000-demo-0000-0000-000000000000)
-- Stand: 07.10.2026, 14:33
+- Mandant: demokunde.onmicrosoft.com · 00000000-demo-0000-0000-000000000000
+- Stand: 07.10.2026, 15:31
 - Erstellt von: Max Mustermann
+- Objekte: 41
+- Verwaltete Geräte: 37
 - Partner: Muster IT-Partner GmbH
-- Objekte: 41 · Verwaltete Geräte: 37
 - Erstellt mit Intune Inspector
 
-> Hinweis: Beispieldaten (Demo-Modus)
+> Beispieldaten (Demo-Modus)
 
 ## Management-Zusammenfassung
 
@@ -157,7 +158,7 @@ Ablaufende Zertifikate oder Token stoppen die Verwaltung der betroffenen Geräte
 | Compliance-Einstellungen des Mandanten | Mandanteneinstellungen | — | — | — |
 | iOS – Supervised | Zuweisungsfilter | iOS/iPadOS | — | 01.03.2025 |
 
-## Details
+## Details je Objekt
 
 ### Konfiguration
 
@@ -184,8 +185,8 @@ Ablaufende Zertifikate oder Token stoppen die Verwaltung der betroffenen Geräte
 
 | Einstellung | Wert |
 | --- | --- |
-| Benutzer › Microsoft Word 2016 › Word-Optionen › Sicherheit › VBA-Makros aus dem Internet blockieren | Aktiviert |
-| Benutzer › Microsoft Office 2016 › Erste Ausführung › Ersteinrichtung unterdrücken | Aktiviert |
+| Benutzer › Microsoft Word 2016 › Word Options › Security › Block macros from running in Office files from the Internet | Enabled |
+| Benutzer › Microsoft Office 2016 › First Run › Disable the Office First Run on application boot | Enabled |
 
 #### WIN – Custom OMA-URI Sperrbildschirm
 
@@ -210,7 +211,7 @@ Ablaufende Zertifikate oder Token stoppen die Verwaltung der betroffenen Geräte
 
 | Einstellung | Wert |
 | --- | --- |
-| Diashow Sperrbildschirm — ./Device/Vendor/MSFT/Policy/Config/DeviceLock/PreventLockScreenSlideShow | 1 |
+| Lock screen slide show — ./Device/Vendor/MSFT/Policy/Config/DeviceLock/PreventLockScreenSlideShow | 1 |
 
 #### iOS – Geräteeinschränkungen
 
@@ -262,8 +263,8 @@ Ablaufende Zertifikate oder Token stoppen die Verwaltung der betroffenen Geräte
 
 | Einstellung | Wert |
 | --- | --- |
-| Startseiten-URL | https://intranet.demokunde.de |
-| Blockliste für Erweiterungen | * |
+| Configure the home page URL | https://intranet.demokunde.de |
+| Control which extensions cannot be installed | * |
 
 #### Edge Settings (alt)
 
@@ -288,7 +289,7 @@ Ablaufende Zertifikate oder Token stoppen die Verwaltung der betroffenen Geräte
 
 | Einstellung | Wert |
 | --- | --- |
-| Startseiten-URL | https://intranet.demokunde.de |
+| Configure the home page URL | https://intranet.demokunde.de |
 
 #### Test_Policy_Kopie (2)
 
@@ -311,7 +312,7 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Kamera zulassen | Blockiert |
+| Allow Camera | Block |
 
 #### WIN – OneDrive Known Folder Move
 
@@ -337,8 +338,8 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Bekannte Ordner automatisch umleiten | Aktiviert |
-| ↳ Mandanten-ID | [TENANT-ID] |
+| Silently move Windows known folders to OneDrive | Enabled |
+| ↳ Tenant ID | [TENANT-ID] |
 
 #### WLAN – Firmennetz
 
@@ -392,8 +393,8 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Cloudschutzebene | Standard |
-| Echtzeitüberwachung zulassen | Zugelassen |
+| Cloud Block Level | Default |
+| Allow Realtime Monitoring | Allowed |
 
 #### WIN – BitLocker Basis
 
@@ -422,10 +423,10 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Geräteverschlüsselung erforderlich | Aktiviert |
-| Verschlüsselungsmethode OS-Laufwerk | XTS-AES 256-Bit |
-| Wiederherstellungsinformationen in Entra ID speichern | Aktiviert |
-| Warnung für andere Verschlüsselung | Blockieren |
+| Require Device Encryption | Enabled |
+| Select the encryption method for operating system drives | XTS-AES 256-bit |
+| Save BitLocker recovery information to Azure Active Directory | Enabled |
+| Allow Warning For Other Disk Encryption | Block |
 
 #### WIN – Firewall Domäne/Privat/Öffentlich
 
@@ -450,9 +451,9 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Domänenprofil: Firewall aktivieren | True |
-| Öffentliches Profil: Firewall aktivieren | True |
-| Öffentliches Profil: Standard eingehend | Blockieren |
+| Domain profile: Enable Firewall | True |
+| Public profile: Enable Firewall | True |
+| Public profile: Default Inbound Action | Block |
 
 ### Security Baselines
 
@@ -480,10 +481,10 @@ _keine Einträge_
 
 | Einstellung | Wert |
 | --- | --- |
-| Verschlüsselungsmethode OS-Laufwerk | XTS-AES 128-Bit |
-| Echtzeitüberwachung zulassen | Zugelassen |
-| Cloudschutzebene | Hoch |
-| Unsichere Gastanmeldungen | Deaktiviert |
+| Select the encryption method for operating system drives | XTS-AES 128-bit |
+| Allow Realtime Monitoring | Allowed |
+| Cloud Block Level | High |
+| Enable insecure guest logons | Disabled |
 
 ### Compliance
 
@@ -980,7 +981,7 @@ killall Dock
 | Plattform | iOS/iPadOS |
 | ADE-Token | Demo-Kunde ABM |
 | Standardprofil | Ja |
-| Zuletzt geändert | 25.05.2025, 14:33 |
+| Zuletzt geändert | 25.05.2025, 15:31 |
 | Status | Mandantenweit / nicht zuweisbar |
 | Objekt-ID | adep-1 |
 
@@ -1092,8 +1093,8 @@ killall Dock
 | --- | --- |
 | Apple-ID | abm-admin@demokunde.de |
 | Typ | Apple Business Manager |
-| Token gültig bis | 07.05.2027, 14:33 |
-| Letzte erfolgreiche Synchronisierung | 07.10.2026, 07:21 |
+| Token gültig bis | 07.05.2027, 15:31 |
+| Letzte erfolgreiche Synchronisierung | 07.10.2026, 08:19 |
 | Synchronisierte Geräte | 12 |
 | Letzter Sync-Fehlercode | keiner |
 | Datenfreigabe an Apple erteilt | Ja |
@@ -1105,7 +1106,7 @@ killall Dock
 | Bereich | Plattform-Anbindungen |
 | Kategorie | Apple MDM-Push-Zertifikat (APNs) |
 | Plattform | iOS/iPadOS, macOS |
-| Zuletzt geändert | 28.10.2025, 13:33 |
+| Zuletzt geändert | 28.10.2025, 14:31 |
 | Status | Mandantenweit / nicht zuweisbar |
 | Objekt-ID | apns |
 
@@ -1114,7 +1115,7 @@ killall Dock
 | Einstellung | Wert |
 | --- | --- |
 | Apple-ID (für die Verlängerung zwingend dieselbe!) | it-apple@demokunde.de |
-| Gültig bis | 28.10.2026, 13:33 |
+| Gültig bis | 28.10.2026, 14:31 |
 | Topic-ID | com.apple.mgmt.External.4f2c… |
 | Seriennummer | 6A1F…C2 |
 | Upload-Status | Erfolgreich |
@@ -1137,8 +1138,8 @@ killall Dock
 | Apple-ID | abm-admin@demokunde.de |
 | Standort | Hauptsitz |
 | Status | Gültig |
-| Gültig bis | 24.11.2026, 13:33 |
-| Letzte Synchronisierung | 07.10.2026, 02:33 |
+| Gültig bis | 24.11.2026, 14:31 |
+| Letzte Synchronisierung | 07.10.2026, 03:31 |
 | Sync-Status | completed |
 | Apps automatisch aktualisieren | Ja |
 | Land/Region | de |
@@ -1160,7 +1161,7 @@ killall Dock
 | Verbindungsstatus | Verbunden und geprüft |
 | Verknüpftes Google-Konto (Besitzer) | android-admin@demokunde.de |
 | Organisation | Demo-Kunde GmbH |
-| Letzte App-Synchronisierung | 07.10.2026, 09:45 |
+| Letzte App-Synchronisierung | 07.10.2026, 10:43 |
 | Sync-Status | success |
 | Arbeitsprofil-Registrierung erlaubt für | All |
 | Vollständig verwaltete Geräte erlaubt | Ja |
@@ -1180,7 +1181,7 @@ killall Dock
 | Einstellung | Wert |
 | --- | --- |
 | Status | Aktiv |
-| Letztes Lebenszeichen | 07.10.2026, 14:05 |
+| Letztes Lebenszeichen | 07.10.2026, 15:02 |
 | Android-Geräte verbinden | Ja |
 | iOS-Geräte verbinden | Ja |
 | Windows-Geräte verbinden | Ja |
@@ -1288,7 +1289,7 @@ killall Dock
 
 | Objekt | Bereich / Kategorie | Art | Absicht | Filter |
 | --- | --- | --- | --- | --- |
-| iOS – Geräteeinschränkungen | Konfiguration / Geräteeinschränkungen | Eingeschlossen |  | include: iOS – Supervised |
+| iOS – Geräteeinschränkungen | Konfiguration / Geräteeinschränkungen | Eingeschlossen |  | Einschluss: iOS – Supervised |
 | iOS – Compliance | Compliance / Compliance-Richtlinie | Eingeschlossen |  |  |
 | Microsoft Outlook (iOS) | Apps / Volumenlizenz-App (VPP) | Eingeschlossen | Erforderlich |  |
 
@@ -1335,12 +1336,12 @@ killall Dock
 
 ## Konflikte & Dubletten
 
-### Konflikt (Hoch): Cloudschutzebene
+### Konflikt (Hoch): Cloud Block Level
 
 | Richtlinie | Wert | Zuweisung |
 | --- | --- | --- |
-| Security Baseline 2024 | Hoch | Alle Geräte |
-| AV – Vertrieb | Standard | GRP-Vertrieb |
+| Security Baseline 2024 | High | Alle Geräte |
+| AV – Vertrieb | Default | GRP-Vertrieb |
 
 ### Konflikt (Hoch): Quality Updates Deferral Period In Days
 
@@ -1349,21 +1350,21 @@ killall Dock
 | WU – Ring 2 Breit | 7 | Alle Geräte |
 | WU – Ring IT | 0 | GRP-IT-Admins |
 
-### Konflikt (Hoch): Verschlüsselungsmethode OS-Laufwerk
+### Konflikt (Hoch): Select the encryption method for operating system drives
 
 | Richtlinie | Wert | Zuweisung |
 | --- | --- | --- |
-| WIN – BitLocker Basis | XTS-AES 256-Bit | GRP-Win-Clients |
-| Security Baseline 2024 | XTS-AES 128-Bit | Alle Geräte |
+| WIN – BitLocker Basis | XTS-AES 256-bit | GRP-Win-Clients |
+| Security Baseline 2024 | XTS-AES 128-bit | Alle Geräte |
 
-### Dublette (Niedrig): Echtzeitüberwachung zulassen
+### Dublette (Niedrig): Allow Realtime Monitoring
 
 | Richtlinie | Wert | Zuweisung |
 | --- | --- | --- |
-| Security Baseline 2024 | Zugelassen | Alle Geräte |
-| AV – Vertrieb | Zugelassen | GRP-Vertrieb |
+| Security Baseline 2024 | Allowed | Alle Geräte |
+| AV – Vertrieb | Allowed | GRP-Vertrieb |
 
-### Dublette (Niedrig): Startseiten-URL
+### Dublette (Niedrig): Configure the home page URL
 
 | Richtlinie | Wert | Zuweisung |
 | --- | --- | --- |
@@ -1464,7 +1465,8 @@ killall Dock
 
 | Art | Objekt | Bereich | Details |
 | --- | --- | --- | --- |
-| Geändert | WIN – BitLocker Basis | Endpoint Security | Verschlüsselungsmethode OS-Laufwerk: XTS-AES 128-Bit → XTS-AES 256-Bit |
+| Geändert | Microsoft Defender for Endpoint | Plattform-Anbindungen | Letztes Lebenszeichen: 07.10.2026, 15:03 → 07.10.2026, 15:02 |
+| Geändert | WIN – BitLocker Basis | Endpoint Security | Select the encryption method for operating system drives: XTS-AES 128-bit → XTS-AES 256-bit |
 | Zuweisung | WU – Ring 1 Pilot | Windows Updates | − Zuweisung GRP-Update-Pilot |
 | Neu | AV – Vertrieb | Endpoint Security | 2 Einstellungen, 1 Zuweisungen |
 | Neu | Remediation – Temp bereinigen | Skripte & Remediations | 1 Einstellungen, 1 Zuweisungen |

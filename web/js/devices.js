@@ -1,6 +1,7 @@
 // Geräteinventar und Plattform-Anbindungen (APNs, ADE, VPP, Managed Google Play, MTD, Partner).
 // Reine Funktionen ohne Netzwerkzugriff.
 import { baseObject, flattenProps, humanize } from './normalize.js';
+import { T, tv } from './i18n.js';
 
 const DAY = 86400000;
 const dt = (iso) => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? String(iso) : d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); };
@@ -104,7 +105,6 @@ function conn(sourceKey, item, category, name, platform, extra) {
   o.name = name;
   o.platform = platform;
   o.assignable = false;
-  o.health = [];
   o.meta = [];
   return o;
 }
@@ -135,8 +135,6 @@ export function adeObject(t) {
     { key: 'ade.err', label: 'Letzter Sync-Fehlercode', value: t.lastSyncErrorCode ? String(t.lastSyncErrorCode) : 'keiner' },
     { key: 'ade.consent', label: 'Datenfreigabe an Apple erteilt', value: t.dataSharingConsentGranted ? 'Ja' : 'Nein' }
   ];
-  if (t.lastSyncErrorCode) o.health.push({ sev: 'medium', text: 'Letzte ADE-Synchronisierung meldet Fehlercode ' + t.lastSyncErrorCode + '.' });
-  if (t.lastSuccessfulSyncDateTime && Date.now() - Date.parse(t.lastSuccessfulSyncDateTime) > 7 * DAY) o.health.push({ sev: 'medium', text: 'ADE-Token wurde seit über 7 Tagen nicht erfolgreich synchronisiert.' });
   o.raw = Object.assign({}, t, { enrollmentProfiles: undefined });
   return o;
 }
@@ -166,7 +164,6 @@ export function vppObject(t) {
     { key: 'vpp.autoUpdate', label: 'Apps automatisch aktualisieren', value: t.automaticallyUpdateApps ? 'Ja' : 'Nein' },
     { key: 'vpp.country', label: 'Land/Region', value: t.countryOrRegion || '—' }
   ];
-  if (t.state && t.state !== 'valid') o.health.push({ sev: 'high', text: 'VPP-Token-Status: ' + (VPP_STATE[t.state] || t.state) + '.' });
   o.raw = t;
   return o;
 }
@@ -183,7 +180,6 @@ export function mgpObject(s) {
     { key: 'mgp.fully', label: 'Vollständig verwaltete Geräte erlaubt', value: s.androidDeviceOwnerFullyManagedEnrollmentEnabled ? 'Ja' : 'Nein' }
   ];
   o.bound = s.bindStatus === 'bound' || s.bindStatus === 'boundAndValidated';
-  if (s.lastAppSyncStatus && !/success/i.test(s.lastAppSyncStatus) && o.bound) o.health.push({ sev: 'medium', text: 'Letzte Managed-Google-Play-Synchronisierung: ' + s.lastAppSyncStatus + '.' });
   o.raw = s;
   return o;
 }
@@ -200,7 +196,6 @@ export function mtdObject(c) {
     { key: 'mtd.mac', label: 'macOS-Geräte verbinden', value: c.macEnabled ? 'Ja' : 'Nein' },
     { key: 'mtd.block', label: 'Geräte ohne Unterstützung blockieren', value: c.partnerUnsupportedOsVersionBlocked ? 'Ja' : 'Nein' }
   ];
-  if (c.partnerState === 'unresponsive' || c.partnerState === 'error') o.health.push({ sev: 'medium', text: name + ' meldet Status „' + (MTD_STATE[c.partnerState] || c.partnerState) + '“.' });
   o.raw = c;
   return o;
 }
@@ -212,6 +207,20 @@ export function partnerObject(p) {
 }
 
 // ---------- Auswertung ----------
+// Zustandsprüfungen werden zur Auswertungszeit aus den Rohdaten berechnet (sprachabhängige Texte).
+function connectorHealth(o, now) {
+  const r = o.raw || {};
+  const out = [];
+  if (o.sourceKey === 'ade') {
+    if (r.lastSyncErrorCode) out.push({ sev: 'medium', text: T('Letzte ADE-Synchronisierung meldet Fehlercode ' + r.lastSyncErrorCode + '.', 'Last ADE sync reported error code ' + r.lastSyncErrorCode + '.') });
+    if (r.lastSuccessfulSyncDateTime && now - Date.parse(r.lastSuccessfulSyncDateTime) > 7 * DAY) out.push({ sev: 'medium', text: T('ADE-Token wurde seit über 7 Tagen nicht erfolgreich synchronisiert.', 'ADE token has not synced successfully for more than 7 days.') });
+  }
+  if (o.sourceKey === 'vpp' && r.state && r.state !== 'valid') out.push({ sev: 'high', text: T('VPP-Token-Status: ', 'VPP token status: ') + tv(VPP_STATE[r.state] || r.state) + '.' });
+  if (o.sourceKey === 'mgp' && o.bound && r.lastAppSyncStatus && !/success/i.test(r.lastAppSyncStatus)) out.push({ sev: 'medium', text: T('Letzte Managed-Google-Play-Synchronisierung: ', 'Last Managed Google Play sync: ') + r.lastAppSyncStatus + '.' });
+  if (o.sourceKey === 'mtd' && (r.partnerState === 'unresponsive' || r.partnerState === 'error')) out.push({ sev: 'medium', text: T(o.name + ' meldet Status „' + MTD_STATE[r.partnerState] + '“.', o.name + ' reports status “' + tv(MTD_STATE[r.partnerState]) + '”.') });
+  return out;
+}
+
 export function analyzeConnectors(objs, devices, now) {
   now = now || Date.now();
   const conns = objs.filter((o) => o.area === AREA);
@@ -220,23 +229,24 @@ export function analyzeConnectors(objs, devices, now) {
   for (const o of conns) {
     let days = null;
     if (o.expiry) days = Math.round((Date.parse(o.expiry) - now) / DAY);
-    const short = o.category.split(' (')[0];
-    const label = short === o.name || o.category.startsWith(o.name) ? o.name : short + ' „' + o.name + '“';
+    const cat = tv(o.category), nm = tv(o.name);
+    const short = cat.split(' (')[0];
+    const label = short === nm || cat.startsWith(nm) ? nm : short + T(' „' + nm + '“', ' “' + nm + '”');
     let sev = 'ok';
     if (days !== null) {
-      if (days < 0) { sev = 'high'; findings.push({ sev: 'high', title: label + ' ist abgelaufen', text: 'Seit ' + Math.abs(days) + ' Tagen. Verwaltung bzw. Synchronisierung funktioniert nicht mehr.', view: 'objects', uid: o.uid }); }
-      else if (days <= 30) { sev = 'high'; findings.push({ sev: 'high', title: label + ' läuft in ' + days + ' Tagen ab', text: o.sourceKey === 'apns' ? 'Mit derselben Apple-ID verlängern, sonst müssen alle Apple-Geräte neu registriert werden.' : 'Rechtzeitig verlängern.', view: 'objects', uid: o.uid }); }
-      else if (days <= 60) { sev = 'medium'; findings.push({ sev: 'medium', title: label + ' läuft in ' + days + ' Tagen ab', text: 'Verlängerung einplanen.', view: 'objects', uid: o.uid }); }
+      if (days < 0) { sev = 'high'; findings.push({ sev: 'high', title: label + T(' ist abgelaufen', ' has expired'), text: T('Seit ' + Math.abs(days) + ' Tagen. Verwaltung bzw. Synchronisierung funktioniert nicht mehr.', 'For ' + Math.abs(days) + ' days. Management or sync no longer works.'), view: 'objects', uid: o.uid }); }
+      else if (days <= 30) { sev = 'high'; findings.push({ sev: 'high', title: label + T(' läuft in ' + days + ' Tagen ab', ' expires in ' + days + ' days'), text: o.sourceKey === 'apns' ? T('Mit derselben Apple-ID verlängern, sonst müssen alle Apple-Geräte neu registriert werden.', 'Renew with the same Apple ID, otherwise all Apple devices must be re-enrolled.') : T('Rechtzeitig verlängern.', 'Renew in time.'), view: 'objects', uid: o.uid }); }
+      else if (days <= 60) { sev = 'medium'; findings.push({ sev: 'medium', title: label + T(' läuft in ' + days + ' Tagen ab', ' expires in ' + days + ' days'), text: T('Verlängerung einplanen.', 'Plan the renewal.'), view: 'objects', uid: o.uid }); }
     }
-    for (const h of o.health || []) { findings.push({ sev: h.sev, title: h.text, text: o.name, view: 'objects', uid: o.uid }); if (sev === 'ok' || (sev === 'medium' && h.sev === 'high')) sev = h.sev; }
+    for (const h of connectorHealth(o, now)) { findings.push({ sev: h.sev, title: h.text, text: nm, view: 'objects', uid: o.uid }); if (sev === 'ok' || (sev === 'medium' && h.sev === 'high')) sev = h.sev; }
     if (o.sourceKey === 'mgp' && !o.bound) sev = 'info';
     rows.push({ uid: o.uid, name: o.name, category: o.category, platform: o.platform, expiry: o.expiry || '', days, sev });
   }
   const apple = devices.filter((d) => d.platform === 'iOS/iPadOS' || d.platform === 'macOS').length;
   const android = devices.filter((d) => d.platform === 'Android').length;
-  if (apple && !conns.some((o) => o.sourceKey === 'apns')) findings.push({ sev: 'high', title: 'Kein Apple MDM-Push-Zertifikat gefunden', text: apple + ' Apple-Geräte sind registriert – Zertifikat prüfen.', view: 'devices' });
+  if (apple && !conns.some((o) => o.sourceKey === 'apns')) findings.push({ sev: 'high', title: T('Kein Apple MDM-Push-Zertifikat gefunden', 'No Apple MDM push certificate found'), text: T(apple + ' Apple-Geräte sind registriert – Zertifikat prüfen.', apple + ' Apple devices are enrolled – check the certificate.'), view: 'devices' });
   const mgp = conns.find((o) => o.sourceKey === 'mgp');
-  if (android && mgp && !mgp.bound) findings.push({ sev: 'info', title: 'Managed Google Play ist nicht verbunden', text: android + ' Android-Geräte vorhanden; ohne Verbindung keine Android-Enterprise-Verwaltung.', view: 'objects', uid: mgp.uid });
+  if (android && mgp && !mgp.bound) findings.push({ sev: 'info', title: T('Managed Google Play ist nicht verbunden', 'Managed Google Play is not bound'), text: T(android + ' Android-Geräte vorhanden; ohne Verbindung keine Android-Enterprise-Verwaltung.', android + ' Android devices present; without binding there is no Android Enterprise management.'), view: 'objects', uid: mgp.uid });
   rows.sort((a, b) => (a.days === null) - (b.days === null) || (a.days || 0) - (b.days || 0));
   return { rows, findings };
 }
@@ -254,12 +264,12 @@ export function analyzeDevices(devices, autopilot, now) {
   const versions = {};
   for (const [p] of byPlatform) versions[p] = count(devices.filter((d) => d.platform === p), (d) => d.osVersion).slice(0, 10);
   const findings = [];
-  if (noncompliant.length) findings.push({ sev: 'medium', title: noncompliant.length + ' Gerät(e) nicht konform', text: 'Bedingter Zugriff kann diese Geräte blockieren.', view: 'devices', dfilter: 'noncompliant' });
-  if (jailbroken.length) findings.push({ sev: 'high', title: jailbroken.length + ' Gerät(e) mit Jailbreak/Root', text: 'Kompromittierte Mobilgeräte.', view: 'devices', dfilter: 'jailbroken' });
-  if (unencrypted.length) findings.push({ sev: 'medium', title: unencrypted.length + ' Windows-/macOS-Gerät(e) unverschlüsselt', text: 'BitLocker bzw. FileVault nicht aktiv.', view: 'devices', dfilter: 'unencrypted' });
-  if (stale.length) findings.push({ sev: 'low', title: stale.length + ' Gerät(e) seit über 30 Tagen ohne Check-in', text: 'Kandidaten für Bereinigungsregeln.', view: 'devices', dfilter: 'stale' });
+  if (noncompliant.length) findings.push({ sev: 'medium', title: T(noncompliant.length + ' Gerät(e) nicht konform', noncompliant.length + ' noncompliant device(s)'), text: T('Bedingter Zugriff kann diese Geräte blockieren.', 'Conditional Access may block these devices.'), view: 'devices', dfilter: 'noncompliant' });
+  if (jailbroken.length) findings.push({ sev: 'high', title: T(jailbroken.length + ' Gerät(e) mit Jailbreak/Root', jailbroken.length + ' jailbroken/rooted device(s)'), text: T('Kompromittierte Mobilgeräte.', 'Compromised mobile devices.'), view: 'devices', dfilter: 'jailbroken' });
+  if (unencrypted.length) findings.push({ sev: 'medium', title: T(unencrypted.length + ' Windows-/macOS-Gerät(e) unverschlüsselt', unencrypted.length + ' unencrypted Windows/macOS device(s)'), text: T('BitLocker bzw. FileVault nicht aktiv.', 'BitLocker or FileVault not active.'), view: 'devices', dfilter: 'unencrypted' });
+  if (stale.length) findings.push({ sev: 'low', title: T(stale.length + ' Gerät(e) seit über 30 Tagen ohne Check-in', stale.length + ' device(s) without check-in for over 30 days'), text: T('Kandidaten für Bereinigungsregeln.', 'Candidates for device clean-up rules.'), view: 'devices', dfilter: 'stale' });
   const apNoProfile = (autopilot || []).filter((a) => a.profile === 'Kein Profil');
-  if (apNoProfile.length) findings.push({ sev: 'low', title: apNoProfile.length + ' Autopilot-Gerät(e) ohne Bereitstellungsprofil', text: 'Diese Geräte durchlaufen kein Autopilot-Setup.', view: 'devices', dfilter: 'autopilot' });
+  if (apNoProfile.length) findings.push({ sev: 'low', title: T(apNoProfile.length + ' Autopilot-Gerät(e) ohne Bereitstellungsprofil', apNoProfile.length + ' Autopilot device(s) without deployment profile'), text: T('Diese Geräte durchlaufen kein Autopilot-Setup.', 'These devices will not go through Autopilot setup.'), view: 'devices', dfilter: 'autopilot' });
   return {
     total: devices.length, byPlatform, versions,
     byCompliance: count(devices, (d) => COMPLIANCE[d.compliance] || d.compliance),
@@ -281,5 +291,6 @@ export function analyzeDevices(devices, autopilot, now) {
 export function fmtBytes(b) {
   if (!b) return '—';
   const gb = b / 1073741824;
-  return gb >= 1 ? gb.toFixed(gb >= 100 ? 0 : 1).replace('.', ',') + ' GB' : Math.round(b / 1048576) + ' MB';
+  const n = gb >= 1 ? gb.toFixed(gb >= 100 ? 0 : 1) : String(Math.round(b / 1048576));
+  return T(n.replace('.', ','), n) + (gb >= 1 ? ' GB' : ' MB');
 }

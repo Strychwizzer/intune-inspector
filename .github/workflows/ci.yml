@@ -31,3 +31,4 @@ jobs:
         run: |
           node logic.test.mjs
           node scan-mock.test.mjs
+          node i18n.test.mjs

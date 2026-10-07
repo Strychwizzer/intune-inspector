@@ -19,6 +19,12 @@ Beispiele aus dem Demo-Mandanten: [Word](beispiel/Beispiel-Dokumentation.docx) �
 
 ![Word-Export](screenshots/15-word-export.png)
 
+## Sprache der Dokumentation
+
+Unter *Sprache der Dokumentation* lässt sich **Deutsch oder Englisch** wählen – unabhängig von der Sprache der Oberfläche. So kann man z. B. auf Deutsch arbeiten und dem Kunden eine englische Doku liefern. Die Wahl gilt für alle Formate; CSV-Dateien verwenden auf Englisch das Komma, auf Deutsch das Semikolon als Trennzeichen (passend zur jeweiligen Excel-Einstellung).
+
+Englische Beispiele: [Word](sample/Sample-Documentation.docx) · [PDF](sample/Sample-Documentation.pdf) · [HTML](sample/Sample-Documentation.html) · [Markdown](sample/Sample-Documentation.md)
+
 ## Abschnitte
 
 | Abschnitt | Inhalt | Standard |
@@ -52,4 +58,4 @@ Partner und Autor werden im Browser gemerkt.
 
 ## Dateinamen
 
-`Intune-Doku_<Kunde>_<JJJJ-MM-TT>.<endung>` – das Datum ist das Scan-Datum.
+`Intune-Doku_<Kunde>_<JJJJ-MM-TT>.<endung>` bzw. auf Englisch `Intune-Documentation_<Kunde>_<JJJJ-MM-TT>.<endung>` – das Datum ist das Scan-Datum.

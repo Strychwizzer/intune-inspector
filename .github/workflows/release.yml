@@ -24,6 +24,7 @@ jobs:
         run: |
           node logic.test.mjs
           node scan-mock.test.mjs
+          node i18n.test.mjs
       - name: Version aus Tag mit main.go abgleichen
         run: |
           TAG="${GITHUB_REF_NAME#v}"

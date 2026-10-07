@@ -16,13 +16,15 @@ web/
     normalize.js        Reine Funktionen: Settings Catalog abflachen, Zuweisungen, Kategorien, Geheimnisse ausblenden
     devices.js          Geräteinventar, Autopilot, Plattform-Anbindungen und deren Auswertung
     analyze.js          Kennzahlen, Befunde, Konflikte, Zuweisungsindex, Snapshot-Vergleich
-    export.js           Word, HTML/PDF, Markdown, CSV
+    export.js           Doku als Blockstruktur (buildDoc) → Word, HTML/PDF, Markdown; CSV
+    i18n.js             Zweisprachigkeit: T(de, en), Übersetzung gespeicherter Bezeichnungen tv(), Datums-/CSV-Format
     demo.js             Demo-Mandant (gleiches Datenformat wie ein echter Scan)
   vendor/               MSAL.js, docx (eingebettet, keine CDN-Abhängigkeit)
   fonts/                IBM Plex Sans / Mono
 tests/
   logic.test.mjs        Auswertung, Vergleich, Ausblenden von Geheimnissen (Demo-Daten)
-  scan-mock.test.mjs    Kompletter Scan gegen eine simulierte Graph-API (Paging, Fallbacks, 429, 404, Base64)
+  scan-mock.test.mjs    Kompletter Scan gegen eine simulierte Graph-API (Paging, Fallbacks, 429, 404, Base64) + englische Ausgabe
+  i18n.test.mjs         Komplette englische Doku des Demo-Mandanten auf deutsche Reste prüfen
 tools/
   package.sh            Baut alle Plattformen und packt ZIPs + SHA256SUMS nach dist/
   screenshots.py        Erzeugt die Screenshots und Beispiel-Exporte der Doku aus dem Demo-Modus
@@ -61,6 +63,14 @@ Ein Scan ergibt einen **Snapshot** (JSON):
 
 `settings[].key` ist der Vergleichsschlüssel für Konflikte und den Snapshot-Vergleich.
 
+## Zweisprachigkeit
+
+- **Oberflächentexte** stehen direkt im Code als `T('Deutsch', 'English')`.
+- **Gespeicherte Bezeichnungen** (Bereiche, Kategorien, Zuweisungsarten, Gerätestatus …) schreibt der Scanner bewusst auf Deutsch in den Snapshot. So bleiben ältere Snapshots und der Vergleich sprachunabhängig. Beim Anzeigen und Exportieren übersetzt `tv()` sie über das Wörterbuch `DATA_EN` bzw. Muster in `web/js/i18n.js`.
+- **Befunde und Vergleichstexte** werden bei jedem Sprachwechsel neu berechnet.
+- Neue deutsche Bezeichnung im Scanner → Eintrag in `DATA_EN` ergänzen. `tests/i18n.test.mjs` und `tests/scan-mock.test.mjs` schlagen an, wenn in der englischen Ausgabe deutsche Texte übrig bleiben.
+- Der Export läuft über `withLang(sprache, …)` und kann so eine andere Sprache als die Oberfläche verwenden.
+
 ## Neue Quelle hinzufügen
 
 1. In `web/js/scanner.js` einen Eintrag in `SOURCES` ergänzen (`path`, `expand`, `kind`, ggf. `fixed: [Bereich, Kategorie]`).
@@ -84,6 +94,7 @@ go run . -no-browser           # dann http://localhost:8400/?demo öffnen
 cd tests
 node logic.test.mjs
 node scan-mock.test.mjs
+node i18n.test.mjs
 ```
 
 Voraussetzung: Node.js 20+ (keine npm-Pakete nötig).
@@ -93,7 +104,8 @@ Voraussetzung: Node.js 20+ (keine npm-Pakete nötig).
 ```sh
 go run . -no-browser -data /tmp/ii-demo &        # leerer Datenordner → Einrichtungsseite erscheint
 pip install playwright && playwright install chromium
-python tools/screenshots.py docs/screenshots
+python tools/screenshots.py docs/screenshots de
+python tools/screenshots.py docs/screenshots/en en     # danach Dateien in docs/screenshots/en englisch benennen
 # PDF-Beispiel (optional, benötigt LibreOffice):
 soffice --headless --convert-to pdf --outdir docs/beispiel docs/beispiel/Beispiel-Dokumentation.docx
 ```

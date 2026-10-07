@@ -1,5 +1,20 @@
 # Änderungen
 
+## 1.2.0 – 2026-10-07
+
+### Neu
+- **Zweisprachig: Deutsch und Englisch.** Umschalter in der Kopfzeile, auf der Anmeldeseite und in den Einstellungen; Startsprache nach Browsersprache, wird gemerkt. Aufruf mit `?lang=en` bzw. `?lang=de` möglich.
+- **Sprache der Dokumentation separat wählbar** – z. B. deutsche Oberfläche, englische Kundendoku. Gilt für Word, PDF, HTML, Markdown und CSV (CSV in Englisch mit Komma als Trennzeichen).
+- Befunde, Snapshot-Vergleich und alle Bezeichnungen werden in der aktiven Sprache erzeugt; bestehende Snapshots bleiben kompatibel.
+- Englische Screenshots, Beispiel-Dokumente (`docs/sample/`) und `README.en.md`.
+
+### Verbessert
+- Exporte werden intern aus einer gemeinsamen Blockstruktur erzeugt – jeder Text existiert nur noch einmal.
+- Demo-Mandant mit realistischen (englischen) Einstellungsnamen, wie sie Microsoft Graph liefert.
+
+### Behoben
+- Klick auf Befunde wie „Objekte ohne Zuweisung“ führte zur Übersicht statt zur gefilterten Objektliste.
+
 ## 1.1.0 – 2026-10-07
 
 ### Neu

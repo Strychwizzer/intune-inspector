@@ -1,6 +1,6 @@
 # Checkliste vor der Veröffentlichung
 
-Stand Version 1.1: Code, Oberfläche, Exporte und Scan-Logik sind getestet – mit Demo-Daten, im Browser (Chromium) und gegen eine simulierte Graph-API. Vor einer öffentlichen Freigabe fehlen noch die folgenden Punkte.
+Stand Version 1.2: Code, Oberfläche, Exporte und Scan-Logik sind getestet – mit Demo-Daten, im Browser (Chromium) und gegen eine simulierte Graph-API. Vor einer öffentlichen Freigabe fehlen noch die folgenden Punkte.
 
 ## 1. Test gegen echte Mandanten
 
@@ -13,6 +13,7 @@ Stand Version 1.1: Code, Oberfläche, Exporte und Scan-Logik sind getestet – m
 - [ ] APNs-, ADE- und VPP-Ablaufdaten mit *Mandantenverwaltung → Connectors und Token* vergleichen.
 - [ ] Konflikte gegen den Intune-Bericht „Konflikte bei Konfigurationsrichtlinien“ plausibilisieren.
 - [ ] Großen Mandanten testen (Laufzeit, Drosselung, > 1.000 Geräte).
+- [ ] Englische Oberfläche und englischen Export mit echten Daten prüfen (Begriffe, die das Wörterbuch noch nicht kennt, erscheinen deutsch).
 - [ ] Word-Export in Microsoft Word öffnen (Inhaltsverzeichnis aktualisieren), PDF aus Edge und Chrome drucken.
 - [ ] Windows: Start per Doppelklick, SmartScreen-Verhalten, Firefox als Standardbrowser.
 - [ ] macOS: Start, Gatekeeper-Hinweis.
@@ -47,7 +48,7 @@ Unsignierte Programme lösen SmartScreen- bzw. Gatekeeper-Warnungen aus. Für ei
 ## 5. Veröffentlichen
 
 1. `CHANGELOG.md` aktualisieren, Version in `main.go` prüfen.
-2. Tag setzen: `git tag v1.1.0 && git push origin v1.1.0`
+2. Tag setzen: `git tag v1.2.0 && git push origin v1.2.0`
 3. GitHub Actions erstellt einen **Release-Entwurf** mit ZIPs für Windows (x64, ARM64), macOS (Apple Silicon, Intel), Linux und `SHA256SUMS.txt`.
 4. Release-Text prüfen (Vorlage unten) und veröffentlichen.
 5. Repository auf *Public* stellen: *Settings → General → Danger Zone → Change visibility*.
@@ -56,16 +57,20 @@ Unsignierte Programme lösen SmartScreen- bzw. Gatekeeper-Warnungen aus. Für ei
 ### Vorlage Release-Text
 
 ```markdown
-## Intune Inspector 1.1
+## Intune Inspector 1.2
 
-Komplette Intune-Umgebung per Doppelklick erfassen und dokumentieren – nur lesend, ohne PowerShell.
+Komplette Intune-Umgebung per Doppelklick erfassen und dokumentieren – nur lesend, ohne PowerShell. Deutsch und Englisch.
 
-**Neu in 1.1**
+**Neu in 1.2**
+- Oberfläche und Dokumentation auf Deutsch und Englisch
+- Doku-Sprache unabhängig von der Oberfläche wählbar
+
+**Seit 1.1**
 - Geräteinventar für Windows, iOS/iPadOS, Android, macOS inkl. Windows Autopilot
 - Plattform-Anbindungen: APNs, ADE, VPP mit Ablaufwarnung, Managed Google Play, Defender/MTD
 
 **Download**
-- Windows: `IntuneInspector-1.1.0-windows-x64.zip`
+- Windows: `IntuneInspector-1.2.0-windows-x64.zip`
 - macOS: `…-macos-apple-silicon.zip` bzw. `…-macos-intel.zip`
 - Linux: `…-linux-x64.zip`
 

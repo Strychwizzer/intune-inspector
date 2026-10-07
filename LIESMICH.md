@@ -1,4 +1,4 @@
-# Intune Inspector 1.1
+# Intune Inspector 1.2
 
 Bestandsaufnahme und Dokumentation einer kompletten Microsoft-Intune-Umgebung – per Doppelklick, ohne PowerShell, ohne Installation.
 
@@ -18,6 +18,8 @@ Das Programm startet einen kleinen Webserver, der **nur auf diesem Rechner** err
 > **Windows SmartScreen:** Die Datei ist nicht signiert. Beim ersten Start ggf. *Weitere Informationen → Trotzdem ausführen* wählen, oder vorher Rechtsklick auf die ZIP → *Eigenschaften* → *Zulassen*.
 
 Ohne Tenant ausprobieren: Auf der Anmeldeseite **Demo mit Beispieldaten** wählen.
+
+Sprache: Oberfläche und Dokumentation gibt es auf Deutsch und Englisch – Umschalter **EN/DE** oben rechts. / *The interface and documentation are available in German and English – use the **EN/DE** toggle at the top right.*
 
 ---
 
