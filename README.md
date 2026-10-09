@@ -108,7 +108,7 @@ Schritt für Schritt mit allen Details, GDAP-Hinweisen und Verteilung an Kollege
 
 ## Status
 
-Version 1.2. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine simulierte Graph-API getestet. **Ein Test gegen einen echten Mandanten steht noch aus** – siehe [Veröffentlichungs-Checkliste](docs/veroeffentlichung.md).
+Version 1.2.1. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine simulierte Graph-API getestet. Erster Test an einem echten Demo-Mandanten war erfolgreich; weitere Tests (z. B. per GDAP an Kundenmandanten) stehen noch aus – siehe [Veröffentlichungs-Checkliste](docs/veroeffentlichung.md).
 
 ## Lizenz
 

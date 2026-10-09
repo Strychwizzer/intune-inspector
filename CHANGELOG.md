@@ -1,5 +1,18 @@
 # Änderungen
 
+## 1.2.1 – 2026-10-09
+
+Korrekturen nach dem ersten Test an einem echten Mandanten.
+
+### Behoben
+- Zuweisungen zeigten bei Richtlinien die Graph-Absicht „(apply)“ an. Sie wird jetzt ausgeblendet; angezeigt werden nur echte Absichten wie „Erforderlich“, „Verfügbar“ oder „Deinstallieren“.
+- Der Befund „Managed Google Play ist nicht verbunden“ erschien auch, wenn nur AOSP-Geräte vorhanden waren (z. B. Teams-Rooms-Konsolen). Er berücksichtigt jetzt nur noch Android-Enterprise-Geräte.
+- AOSP-Profile wurden als „Vorlage: Aosp Device Owner Device“ und mit Plattform „Android Enterprise“ geführt. Jetzt: „Geräteeinschränkungen (AOSP)“ bzw. „Android (AOSP)“; ebenso eigene Kategorien für Android-Enterprise- und Arbeitsprofil-Einschränkungen.
+- Word-Export: Dokumentsprache wird passend gesetzt und die Rechtschreibprüfung abgeschaltet – keine roten Wellenlinien mehr unter englischen Richtlinien- und Einstellungsnamen.
+
+### Hinweis
+- Bereits gespeicherte Snapshots werden beim Öffnen automatisch angeglichen.
+
 ## 1.2.0 – 2026-10-07
 
 ### Neu

@@ -423,7 +423,9 @@ export function toDocx(m) {
     features: { updateFields: true },
     styles: {
       default: {
-        document: { run: { font: 'Calibri', size: 20 } },
+        // Dokumentsprache passend zur Doku; Rechtschreibprüfung aus, da Richtlinien-, Gruppen- und
+        // Einstellungsnamen meist englisch oder technisch sind (sonst rote Wellenlinien überall).
+        document: { run: { font: 'Calibri', size: 20, noProof: true, language: { value: d.lang === 'en' ? 'en-US' : 'de-DE' } } },
         heading1: { run: { font: 'Calibri', size: 34, bold: true, color: BRAND }, paragraph: { spacing: { before: 240, after: 160 } } },
         heading2: { run: { font: 'Calibri', size: 27, bold: true, color: BRAND }, paragraph: { spacing: { before: 240, after: 120 } } },
         heading3: { run: { font: 'Calibri', size: 23, bold: true, color: '13201F' }, paragraph: { spacing: { before: 240, after: 80 } } },

@@ -61,7 +61,8 @@ export function platformFromType(t) {
   if (t.startsWith('ios') || t.startsWith('managedios')) return 'iOS/iPadOS';
   if (t.startsWith('macos')) return 'macOS';
   if (t.startsWith('androidworkprofile')) return 'Android (Work Profile)';
-  if (t.startsWith('androiddeviceowner') || t.startsWith('androidmanagedstore') || t.startsWith('aosp')) return 'Android Enterprise';
+  if (t.startsWith('aosp')) return 'Android (AOSP)';
+  if (t.startsWith('androiddeviceowner') || t.startsWith('androidmanagedstore')) return 'Android Enterprise';
   if (t.startsWith('android') || t.startsWith('managedandroid')) return 'Android';
   if (t.startsWith('webapp')) return 'Alle';
   return '';
@@ -156,7 +157,9 @@ function walkInstance(inst, defs, rows, depth, path) {
 }
 
 // ---------- Zuweisungen ----------
-const INTENT = { required: 'Erforderlich', available: 'Verfügbar', uninstall: 'Deinstallieren', availableWithoutEnrollment: 'Verfügbar ohne Registrierung' };
+const INTENT = { required: 'Erforderlich', available: 'Verfügbar', uninstall: 'Deinstallieren', availableWithoutEnrollment: 'Verfügbar ohne Registrierung', remove: 'Entfernen' };
+// „apply“ ist bei Richtlinien der Normalfall und wird nicht angezeigt.
+const HIDDEN_INTENTS = new Set(['apply', 'include', 'none', 'unknownFutureValue']);
 
 export function normalizeAssignment(a) {
   const target = a.target || a; // Skripte (groupAssignments) haben kein target-Objekt
@@ -170,7 +173,7 @@ export function normalizeAssignment(a) {
   const fId = target.deviceAndAppManagementAssignmentFilterId;
   const fType = target.deviceAndAppManagementAssignmentFilterType;
   if (fId && fType && fType !== 'none') { out.filterId = fId; out.filterMode = fType; }
-  if (a.intent) out.intent = INTENT[a.intent] || a.intent;
+  if (a.intent && !HIDDEN_INTENTS.has(a.intent)) out.intent = INTENT[a.intent] || a.intent;
   const extras = [];
   if (a.runSchedule) {
     const rs = a.runSchedule; const st = shortType(rs['@odata.type']);
@@ -238,6 +241,9 @@ const DC_RULES = [
   [/editionUpgrade/i, 'Konfiguration', 'Edition-Upgrade'],
   [/sharedPC/i, 'Konfiguration', 'Freigegebener PC'],
   [/DeliveryOptimization/, 'Konfiguration', 'Übermittlungsoptimierung'],
+  [/^aospDeviceOwnerDeviceConfiguration$/, 'Konfiguration', 'Geräteeinschränkungen (AOSP)'],
+  [/^androidDeviceOwnerGeneralDeviceConfiguration$/, 'Konfiguration', 'Geräteeinschränkungen (Android Enterprise)'],
+  [/^androidWorkProfileGeneralDeviceConfiguration$/, 'Konfiguration', 'Geräteeinschränkungen (Arbeitsprofil)'],
   [/(GeneralConfiguration|GeneralDeviceConfiguration|Restriction)/, 'Konfiguration', 'Geräteeinschränkungen'],
   [/ExtensionsConfiguration/, 'Konfiguration', 'Erweiterungen'],
   [/TeamGeneral|Holographic/, 'Konfiguration', 'Spezialgeräte']

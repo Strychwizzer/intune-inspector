@@ -5,7 +5,7 @@ Stand Version 1.2: Code, Oberfläche, Exporte und Scan-Logik sind getestet – m
 ## 1. Test gegen echte Mandanten
 
 - [ ] App-Registrierung wie in [Einrichtung](einrichtung.md) anlegen.
-- [ ] Scan in einem **eigenen Test-/Demo-Tenant** mit möglichst vielen Intune-Objekttypen.
+- [x] Scan in einem **eigenen Test-/Demo-Tenant** mit möglichst vielen Intune-Objekttypen (09.10.2026, Befunde in 1.2.1 korrigiert).
 - [ ] Scan in einem **Kundentenant über GDAP**.
 - [ ] *Scan-Protokoll* prüfen: Welche Quellen liefern 403/404? Erwartbar (nicht lizenziert) oder fehlt eine Berechtigung?
 - [ ] Stichproben: Werte einzelner Settings-Catalog-, ADMX- und Endpoint-Security-Richtlinien mit dem Intune-Portal vergleichen.

@@ -25,4 +25,17 @@ assert.ok(a.findings.some((f) => /Push-Zertifikat läuft in/.test(f.title)), 'AP
 assert.equal(diffSnapshots(demoOlderSnapshot(), s).length, 5, 'fünf Unterschiede zum älteren Snapshot');
 assert.equal(flattenProps({ passwordRequired: true, wifiPreSharedKey: 'x' })[1].value, '(ausgeblendet)', 'Geheimnisse werden ausgeblendet');
 assert.equal(flattenProps({ passwordRequired: true })[0].value, 'Ja', 'passwordRequired bleibt sichtbar');
+// Managed Google Play: Befund nur bei Android-Enterprise-Geräten
+const { analyzeConnectors, normalizeDevice } = await import('../web/js/devices.js');
+const mgpUnbound = [{ area: 'Plattform-Anbindungen', sourceKey: 'mgp', uid: 'mgp:mgp', name: 'Managed Google Play', category: 'Managed Google Play (Android Enterprise)', bound: false, raw: {} }];
+const aospDev = normalizeDevice({ id: 'a', operatingSystem: 'Android', deviceEnrollmentType: 'androidAOSPUserlessDeviceEnrollment' });
+const aeDev = normalizeDevice({ id: 'b', operatingSystem: 'Android', deviceEnrollmentType: 'androidEnterpriseFullyManaged' });
+assert.ok(!analyzeConnectors(mgpUnbound, [aospDev]).findings.length, 'kein Befund bei reinen AOSP-Geräten');
+assert.ok(analyzeConnectors(mgpUnbound, [aospDev, aeDev]).findings.some((f) => /Managed Google Play/.test(f.title)), 'Befund bei Android-Enterprise-Gerät');
+// Alte Snapshots: „apply“ und „Vorlage: …“ werden beim Laden angeglichen
+const { upgradeSnapshot } = await import('../web/js/analyze.js');
+const legacy = upgradeSnapshot({ objects: [{ sourceKey: 'deviceconfig', odataType: 'aospDeviceOwnerDeviceConfiguration', category: 'Vorlage: Aosp Device Owner Device', platform: 'Android Enterprise', assignments: [{ intent: 'apply' }], settings: [] }] });
+assert.equal(legacy.objects[0].category, 'Geräteeinschränkungen (AOSP)');
+assert.equal(legacy.objects[0].platform, 'Android (AOSP)');
+assert.equal(legacy.objects[0].assignments[0].intent, null);
 console.log('\nOK – Logik-Tests bestanden');

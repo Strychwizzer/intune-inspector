@@ -79,7 +79,8 @@ const DATA_EN = {
   'Compliance-Einstellungen des Mandanten': 'Tenant compliance settings', 'Apple ADE-Registrierungsprofile': 'Apple ADE enrollment profiles',
   // Enrollment
   'Registrierungseinschränkungen (Plattform)': 'Enrollment restrictions (platform)', 'Registrierungseinschränkungen': 'Enrollment restrictions',
-  'Gerätelimit': 'Device limit', 'Registrierungsbenachrichtigung': 'Enrollment notification',
+  'Gerätelimit': 'Device limit', 'Entfernen': 'Remove',
+  'Geräteeinschränkungen (AOSP)': 'Device restrictions (AOSP)', 'Geräteeinschränkungen (Android Enterprise)': 'Device restrictions (Android Enterprise)', 'Geräteeinschränkungen (Arbeitsprofil)': 'Device restrictions (work profile)', 'Registrierungsbenachrichtigung': 'Enrollment notification',
   // Apps
   'Win32-App': 'Win32 app', 'MSI (Branchen-App)': 'MSI (line-of-business)', 'Microsoft Store (alt)': 'Microsoft Store (legacy)',
   'Microsoft Store für Unternehmen': 'Microsoft Store for Business', 'Volumenlizenz-App (VPP)': 'Volume-purchased app (VPP)', 'Store-App': 'Store app',

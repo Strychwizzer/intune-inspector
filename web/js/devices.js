@@ -38,6 +38,17 @@ const ENROLL = {
 const JOIN = { azureADJoined: 'Entra Join', azureADRegistered: 'Entra registriert', hybridAzureADJoined: 'Hybrid Entra Join', unknown: '' };
 const AGENT = { mdm: 'Intune (MDM)', eas: 'Exchange ActiveSync', easMdm: 'MDM + EAS', intuneClient: 'Intune-Agent (PC)', configurationManagerClient: 'ConfigMgr', configurationManagerClientMdm: 'Co-Management', configurationManagerClientMdmEas: 'Co-Management + EAS', jamf: 'Jamf', googleCloudDevicePolicyController: 'Google', msSense: 'Defender for Endpoint (Sicherheitsverwaltung)', intuneAosp: 'Intune AOSP', microsoft365ManagedMdm: 'Microsoft 365 verwaltet', unknown: '' };
 
+// Android-Verwaltungsart: Nur Android Enterprise benötigt Managed Google Play.
+// AOSP (z. B. Teams-Rooms-Geräte, Headsets) und Geräteadministrator kommen ohne aus.
+export function androidKind(d) {
+  const et = String(d.deviceEnrollmentType || '');
+  const dt = String(d.deviceType || '');
+  const ag = String(d.managementAgent || '');
+  if (/aosp/i.test(et) || ag === 'intuneAosp' || dt === 'androidnGMS') return 'aosp';
+  if (et.startsWith('androidEnterprise') || dt === 'androidEnterprise' || dt === 'androidForWork') return 'enterprise';
+  return 'other';
+}
+
 export function normalizeDevice(d) {
   const platform = devicePlatform(d.operatingSystem, d.deviceType);
   const patch = d.securityPatchLevel || d.androidSecurityPatchLevel || '';
@@ -70,7 +81,8 @@ export function normalizeDevice(d) {
     patch,
     profile: d.enrollmentProfileName || '',
     sku: d.skuFamily || '',
-    entraId: d.azureADDeviceId && d.azureADDeviceId !== '00000000-0000-0000-0000-000000000000' ? d.azureADDeviceId : ''
+    entraId: d.azureADDeviceId && d.azureADDeviceId !== '00000000-0000-0000-0000-000000000000' ? d.azureADDeviceId : '',
+    androidKind: platform === 'Android' ? androidKind(d) : ''
   };
 }
 
@@ -243,10 +255,11 @@ export function analyzeConnectors(objs, devices, now) {
     rows.push({ uid: o.uid, name: o.name, category: o.category, platform: o.platform, expiry: o.expiry || '', days, sev });
   }
   const apple = devices.filter((d) => d.platform === 'iOS/iPadOS' || d.platform === 'macOS').length;
-  const android = devices.filter((d) => d.platform === 'Android').length;
+  // Ältere Snapshots ohne androidKind: Gerät nur zählen, wenn die Registrierungsart nach Android Enterprise aussieht.
+  const android = devices.filter((d) => d.platform === 'Android' && (d.androidKind ? d.androidKind === 'enterprise' : /Android Enterprise/.test(d.enrollType))).length;
   if (apple && !conns.some((o) => o.sourceKey === 'apns')) findings.push({ sev: 'high', title: T('Kein Apple MDM-Push-Zertifikat gefunden', 'No Apple MDM push certificate found'), text: T(apple + ' Apple-Geräte sind registriert – Zertifikat prüfen.', apple + ' Apple devices are enrolled – check the certificate.'), view: 'devices' });
   const mgp = conns.find((o) => o.sourceKey === 'mgp');
-  if (android && mgp && !mgp.bound) findings.push({ sev: 'info', title: T('Managed Google Play ist nicht verbunden', 'Managed Google Play is not bound'), text: T(android + ' Android-Geräte vorhanden; ohne Verbindung keine Android-Enterprise-Verwaltung.', android + ' Android devices present; without binding there is no Android Enterprise management.'), view: 'objects', uid: mgp.uid });
+  if (android && mgp && !mgp.bound) findings.push({ sev: 'info', title: T('Managed Google Play ist nicht verbunden', 'Managed Google Play is not bound'), text: T(android + ' Android-Enterprise-Geräte vorhanden; ohne Verbindung keine Verwaltung über Managed Google Play.', android + ' Android Enterprise devices present; without binding there is no management via Managed Google Play.'), view: 'objects', uid: mgp.uid });
   rows.sort((a, b) => (a.days === null) - (b.days === null) || (a.days || 0) - (b.days || 0));
   return { rows, findings };
 }

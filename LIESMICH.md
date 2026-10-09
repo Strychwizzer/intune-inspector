@@ -1,4 +1,4 @@
-# Intune Inspector 1.2
+# Intune Inspector 1.2.1
 
 Bestandsaufnahme und Dokumentation einer kompletten Microsoft-Intune-Umgebung – per Doppelklick, ohne PowerShell, ohne Installation.
 

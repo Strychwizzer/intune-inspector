@@ -13,6 +13,7 @@ const data = {
   '/beta/deviceManagement/compliancePolicies': { value: [] },
   '/beta/deviceManagement/deviceConfigurations?$expand=assignments': { value: [
     { '@odata.type': '#microsoft.graph.windowsUpdateForBusinessConfiguration', id: 'dc1', displayName: 'Ring 1', qualityUpdatesDeferralPeriodInDays: 7, assignments: [ga('allDevicesAssignmentTarget')] },
+    { '@odata.type': '#microsoft.graph.aospDeviceOwnerDeviceConfiguration', id: 'dc3', displayName: 'MTR AOSP', passwordRequired: true, assignments: [{ intent: 'apply', target: { '@odata.type': '#microsoft.graph.groupAssignmentTarget', groupId: 'g1' } }] },
     { '@odata.type': '#microsoft.graph.windows10CustomConfiguration', id: 'dc2', displayName: 'Custom', omaSettings: [{ displayName: 'X', omaUri: './Device/X', value: 1 }, { displayName: 'S', omaUri: './Device/S', isEncrypted: true, value: 'enc' }], assignments: [] }] },
   '/beta/deviceManagement/groupPolicyConfigurations?$expand=assignments': { value: [{ id: 'gp1', displayName: 'ADMX', assignments: [ga('groupAssignmentTarget', { groupId: 'g1' })] }] },
   '/beta/deviceManagement/intents': { value: [{ id: 'in1', displayName: 'Old Baseline', templateId: 'tpl1' }] },
@@ -28,7 +29,7 @@ const data = {
   '/beta/deviceManagement/applePushNotificationCertificate': { appleIdentifier: 'it@kunde.de', expirationDateTime: new Date(Date.now()+10*864e5).toISOString(), topicIdentifier: 'com.apple.mgmt.x' },
   '/beta/deviceManagement/depOnboardingSettings': { value: [{ id: 'dep1', tokenName: 'ABM', appleIdentifier: 'abm@kunde.de', tokenExpirationDateTime: new Date(Date.now()-5*864e5).toISOString(), lastSyncErrorCode: 0 }] },
   '/beta/deviceAppManagement/vppTokens': { value: [{ id: 'v1', organizationName: 'Kunde', state: 'valid', expirationDateTime: new Date(Date.now()+300*864e5).toISOString() }] },
-  '/beta/deviceManagement/androidManagedStoreAccountEnterpriseSettings': { error: 404 },
+  '/beta/deviceManagement/androidManagedStoreAccountEnterpriseSettings': { bindStatus: 'notBound' },
   '/beta/deviceManagement/mobileThreatDefenseConnectors': { value: [{ id: 'fc780465-2017-40d4-a0c5-307022471b92', partnerState: 'enabled', windowsEnabled: true }, { id: 'x', partnerState: 'notSetUp' }] },
   '/beta/deviceManagement/deviceManagementPartners': { value: [{ id: 'p1', displayName: 'Jamf', isConfigured: false, partnerState: 'unknown' }] },
   '/beta/deviceManagement/windowsAutopilotDeviceIdentities': { value: [{ id: 'a1', serialNumber: 'S1', model: 'M', groupTag: 'GT', enrollmentState: 'enrolled', deploymentProfileAssignmentStatus: 'notAssigned' }] },
@@ -64,7 +65,7 @@ globalThis.fetch = async (url, opts) => {
       return { id: r.id, status: 200, body: d };
     }) });
   }
-  if (path.startsWith('/beta/deviceManagement/managedDevices?$select=')) return res(200, { value: [{ id: 'm1', deviceName: 'PC1', operatingSystem: 'Windows', osVersion: '10.0.26100.1', complianceState: 'compliant', managedDeviceOwnerType: 'company', deviceEnrollmentType: 'windowsAzureADJoin', joinType: 'azureADJoined', isEncrypted: false, lastSyncDateTime: new Date().toISOString() }, { id: 'm2', deviceName: 'iPhone', operatingSystem: 'iOS', osVersion: '26.0', complianceState: 'noncompliant', managedDeviceOwnerType: 'personal', jailBroken: 'False', lastSyncDateTime: '2025-01-01T00:00:00Z' }] });
+  if (path.startsWith('/beta/deviceManagement/managedDevices?$select=')) return res(200, { value: [{ id: 'm1', deviceName: 'PC1', operatingSystem: 'Windows', osVersion: '10.0.26100.1', complianceState: 'compliant', managedDeviceOwnerType: 'company', deviceEnrollmentType: 'windowsAzureADJoin', joinType: 'azureADJoined', isEncrypted: false, lastSyncDateTime: new Date().toISOString() }, { id: 'm3', deviceName: 'MTR-Konsole', operatingSystem: 'Android', osVersion: '12', deviceEnrollmentType: 'androidAOSPUserlessDeviceEnrollment', managementAgent: 'intuneAosp', complianceState: 'compliant', managedDeviceOwnerType: 'company', lastSyncDateTime: new Date().toISOString() }, { id: 'm2', deviceName: 'iPhone', operatingSystem: 'iOS', osVersion: '26.0', complianceState: 'noncompliant', managedDeviceOwnerType: 'personal', jailBroken: 'False', lastSyncDateTime: '2025-01-01T00:00:00Z' }] });
   const d = data[path] || fallback[path];
   if (!d) return res(404, { error: { code: 'NotFound', message: 'not mocked ' + path } });
   if (d.error) return res(d.error, { error: { code: 'E', message: 'mock ' + d.error } });
@@ -91,14 +92,20 @@ console.log('md length', X.toMarkdown(m).length, 'html', X.toHtml(m).length, 'cs
 // ---- Prüfungen ----
 const assert = (await import('node:assert/strict')).default;
 assert.equal(snap.tenant.displayName, 'Kunde AG');
-assert.equal(snap.devices.length, 2, 'Geräte gelesen');
+assert.equal(snap.devices.length, 3, 'Geräte gelesen');
+const aospObj = snap.objects.find((o) => o.name === 'MTR AOSP');
+assert.equal(aospObj.category, 'Geräteeinschränkungen (AOSP)', 'AOSP-Profil richtig eingeordnet');
+assert.equal(aospObj.platform, 'Android (AOSP)', 'AOSP-Plattform');
+assert.equal(aospObj.assignments[0].intent, null, '„apply“ wird nicht als Absicht angezeigt');
+assert.equal(snap.devices.find((d) => d.id === 'm3').androidKind, 'aosp', 'AOSP-Gerät erkannt');
 assert.equal(snap.autopilot.length, 1, 'Autopilot-Geräte gelesen');
 assert.ok(snap.objects.some((o) => o.name === 'Catalog X'), 'Folgeseite (nextLink) wurde geladen');
 assert.ok(snap.objects.find((o) => o.name === 'Script').code[0].content.includes('Hallo Ä'), 'Skriptinhalt dekodiert (UTF-8)');
 assert.ok(snap.objects.find((o) => o.name === 'Firewall').assignments.some((x) => x.deletedGroup), 'gelöschte Gruppe erkannt');
 assert.ok(snap.objects.find((o) => o.name === 'ADMX').settings.length > 0, 'ADMX-Fallback ohne presentationValues');
 assert.ok(an.findings.some((f) => /abgelaufen/.test(f.title)), 'abgelaufenes ADE-Token gemeldet');
-assert.equal(an.connectors.length, 4, 'vier Plattform-Anbindungen');
+assert.equal(an.connectors.length, 5, 'fünf Plattform-Anbindungen (inkl. nicht verbundenem Managed Google Play)');
+assert.ok(!an.findings.some((f) => /Managed Google Play/.test(f.title)), 'kein MGP-Befund, wenn nur AOSP-Geräte vorhanden sind');
 console.log('\nOK – Scan-Test gegen simulierte Graph-API bestanden');
 
 // ---- Englische Ausgabe der echten Scanner-Daten ----

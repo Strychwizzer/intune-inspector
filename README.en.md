@@ -165,7 +165,7 @@ Detailed documentation is currently available in German:
 
 ## Status
 
-Version 1.2. Logic, interface and exports are tested with demo data and against a simulated Graph API in both languages. **Testing against a real tenant is still pending** – see the [release checklist](docs/veroeffentlichung.md).
+Version 1.2.1. Logic, interface and exports are tested with demo data and against a simulated Graph API in both languages. A first test against a real demo tenant was successful; further tests (e.g. via GDAP against customer tenants) are pending – see the [release checklist](docs/veroeffentlichung.md).
 
 ## License
 

@@ -1,7 +1,18 @@
 // Auswertung eines Snapshots: Kennzahlen, Befunde, Konflikte, Zuweisungsindex, Vergleich.
-import { AREAS } from './normalize.js';
+import { AREAS, deviceConfigCategory, platformFromType } from './normalize.js';
 import { analyzeDevices, analyzeConnectors } from './devices.js';
 import { T, tv } from './i18n.js';
+
+// Snapshots älterer Versionen beim Laden angleichen (verändert das Objekt, gibt es zurück).
+const HIDDEN_INTENTS = new Set(['apply', 'include', 'none', 'unknownFutureValue']);
+export function upgradeSnapshot(snap) {
+  for (const o of snap.objects || []) {
+    for (const a of o.assignments || []) if (a.intent && HIDDEN_INTENTS.has(a.intent)) a.intent = null;
+    if (o.sourceKey === 'deviceconfig' && o.odataType && /^Vorlage: /.test(o.category)) o.category = deviceConfigCategory(o.odataType)[1];
+    if (/^aosp/i.test(o.odataType || '') && o.platform === 'Android Enterprise') o.platform = platformFromType(o.odataType);
+  }
+  return snap;
+}
 
 const DAY = 86400000;
 
@@ -12,6 +23,7 @@ export function status(o) {
 }
 
 export function analyze(snap) {
+  upgradeSnapshot(snap);
   const objs = snap.objects || [];
   const assignable = objs.filter((o) => o.assignable);
   const unassigned = assignable.filter((o) => status(o) === 'unassigned');
@@ -140,6 +152,7 @@ export function buildTargets(objs) {
 
 // Vergleich zweier Snapshots (alt → neu)
 export function diffSnapshots(oldSnap, newSnap) {
+  upgradeSnapshot(oldSnap); upgradeSnapshot(newSnap);
   const oldMap = new Map((oldSnap.objects || []).map((o) => [o.uid, o]));
   const newMap = new Map((newSnap.objects || []).map((o) => [o.uid, o]));
   const out = [];
