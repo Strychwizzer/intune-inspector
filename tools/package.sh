@@ -9,7 +9,7 @@ build() { # GOOS GOARCH Ausgabedatei ZIP-Suffix
   out="dist/stage/$4"
   mkdir -p "$out"
   GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o "$out/$3" .
-  cp LIESMICH.md config.json.beispiel "$out/"
+  cp LIESMICH.md LICENSE THIRD_PARTY_NOTICES.md config.json.beispiel "$out/"
   (cd "$out" && zip -q -9 -r "../../IntuneInspector-$VERSION-$4.zip" .)
 }
 build windows amd64 IntuneInspector.exe windows-x64

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Intune Inspector – Social preview</title>
+<!-- Vorlage für docs/social-preview.png (1280×640). Neu erzeugen:
+     python tools/render-social.py   (benötigt playwright; lädt docs/screenshots/en/03-overview.png) -->
+<style>
+@font-face { font-family: 'Plex'; font-weight: 400; src: url(../web/fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Plex'; font-weight: 600; src: url(../web/fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Plex'; font-weight: 700; src: url(../web/fonts/ibm-plex-sans-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'PlexMono'; font-weight: 500; src: url(../web/fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2'); }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1280px; height: 640px; overflow: hidden; }
+body {
+  font-family: 'Plex', sans-serif; color: #E8F1F0;
+  background: radial-gradient(900px 520px at 88% -10%, rgba(0,87,88,0.75), transparent 62%), #0B1517;
+  display: flex; padding: 64px 0 0 72px; gap: 48px; position: relative;
+}
+.left { width: 580px; display: flex; flex-direction: column; gap: 26px; padding-top: 18px; }
+.brand { display: flex; align-items: center; gap: 16px; }
+.logo { width: 64px; height: 64px; border-radius: 15px; background: #005758; display: flex; align-items: center; justify-content: center; }
+.name { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+h1 { font-size: 46px; line-height: 1.12; font-weight: 600; letter-spacing: -0.025em; }
+h1 em { font-style: normal; color: #5FD4CC; }
+p { font-size: 21px; line-height: 1.45; color: #B9CCCB; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.chip { font-family: 'PlexMono', monospace; font-size: 14px; padding: 6px 12px; border-radius: 999px; background: #15292D; border: 1px solid #2A474C; color: #E8F1F0; }
+.chip.lime { color: #B8E06A; border-color: rgba(184,224,106,.45); background: rgba(184,224,106,.08); }
+.shot { position: absolute; left: 690px; top: 70px; width: 820px; border-radius: 14px; overflow: hidden; border: 1px solid #2A474C; box-shadow: 0 30px 70px rgba(0,0,0,.55); }
+.shot img { display: block; width: 100%; }
+</style>
+</head>
+<body>
+<div class="left">
+  <div class="brand">
+    <div class="logo"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#B8E06A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
+    <span class="name">Intune Inspector</span>
+  </div>
+  <h1>Document an entire Intune tenant <em>in minutes.</em></h1>
+  <p>Double-click, sign in, get a full report of policies, apps, assignments, devices and Autopilot – read-only, no PowerShell.</p>
+  <div class="chips">
+    <span class="chip lime">read-only</span><span class="chip">Word · PDF · MD</span><span class="chip">GDAP-ready</span><span class="chip">DE / EN</span>
+  </div>
+</div>
+<div class="shot"><img src="../docs/screenshots/en/03-overview.png" alt=""></div>
+</body>
+</html>

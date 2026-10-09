@@ -169,6 +169,6 @@ Version 1.2.1. Logic, interface and exports are tested with demo data and agains
 
 ## License
 
-Not decided yet – see [release checklist](docs/veroeffentlichung.md#lizenz). Third-party components and their licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE) – free to use, modify and redistribute, including commercially; provided without warranty. Third-party components and their licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 Microsoft, Intune, Entra and Windows are trademarks of the Microsoft group of companies. This project is not affiliated with Microsoft.

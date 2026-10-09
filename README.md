@@ -112,6 +112,6 @@ Version 1.2.1. Logik, Oberfläche und Exporte sind mit Demo-Daten und gegen eine
 
 ## Lizenz
 
-Noch nicht festgelegt – siehe [Veröffentlichung](docs/veroeffentlichung.md#lizenz). Enthaltene Fremdkomponenten und deren Lizenzen: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE) – freie Nutzung, Veränderung und Weitergabe, auch kommerziell; ohne Gewährleistung. Enthaltene Fremdkomponenten und deren Lizenzen: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 Microsoft, Intune, Entra und Windows sind Marken der Microsoft-Unternehmensgruppe. Dieses Projekt steht in keiner Verbindung zu Microsoft.

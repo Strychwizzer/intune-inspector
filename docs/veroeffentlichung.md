@@ -28,15 +28,7 @@ Gefundene Abweichungen als Issues erfassen; Anpassungen erfolgen meist in `web/j
 
 ## 3. Lizenz
 
-Noch keine Lizenz festgelegt – ohne Lizenzdatei dürfen andere den Code zwar ansehen, aber nicht verwenden oder verändern. Übliche Wahl:
-
-| Lizenz | Wirkung |
-| --- | --- |
-| **MIT** | sehr freizügig, kompatibel mit allen enthaltenen Bibliotheken |
-| **Apache 2.0** | freizügig, mit ausdrücklicher Patentklausel |
-| **GPL 3.0** | Weitergaben müssen ebenfalls offen sein |
-
-Lizenz über GitHub (*Add file → Create new file → `LICENSE` → Choose a license template*) hinzufügen. Die Lizenzen der Fremdkomponenten (MIT, MIT, OFL) stehen in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) und sind mit allen drei Optionen vereinbar.
+- [x] **MIT** festgelegt ([LICENSE](../LICENSE)). Vereinbar mit den Lizenzen der Fremdkomponenten (MIT, MIT, OFL), siehe [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md). Die Lizenzdatei wird in jedes Release-Paket mit aufgenommen.
 
 ## 4. Optional: Code-Signatur
 
@@ -51,8 +43,12 @@ Unsignierte Programme lösen SmartScreen- bzw. Gatekeeper-Warnungen aus. Für ei
 2. Tag setzen: `git tag v1.2.0 && git push origin v1.2.0`
 3. GitHub Actions erstellt einen **Release-Entwurf** mit ZIPs für Windows (x64, ARM64), macOS (Apple Silicon, Intel), Linux und `SHA256SUMS.txt`.
 4. Release-Text prüfen (Vorlage unten) und veröffentlichen.
-5. Repository auf *Public* stellen: *Settings → General → Danger Zone → Change visibility*.
-6. Optional: *About*-Beschreibung und Topics setzen (`intune`, `microsoft-graph`, `documentation`, `endpoint-management`, `autopilot`).
+5. Repository auf *Public* stellen: *Settings → General → Danger Zone → Change visibility*. *(erledigt 09.10.2026)*
+6. *About* setzen (Zahnrad rechts auf der Startseite):
+   - Beschreibung: `Read-only Intune documentation & analysis tool – double-click, sign in, get a full Word/PDF/Markdown report of policies, apps, assignments, devices and Autopilot. No PowerShell. German & English.`
+   - Topics: `intune microsoft-intune microsoft-graph endpoint-management mdm autopilot entra-id documentation m365 msp gdap go`
+7. *Settings → General → Social preview*: `docs/social-preview.png` hochladen.
+8. *Settings → Security → Private vulnerability reporting* aktivieren (SECURITY.md verweist darauf).
 
 ### Vorlage Release-Text
 
