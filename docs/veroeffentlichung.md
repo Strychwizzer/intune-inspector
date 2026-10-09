@@ -40,7 +40,7 @@ Unsignierte Programme lösen SmartScreen- bzw. Gatekeeper-Warnungen aus. Für ei
 ## 5. Veröffentlichen
 
 1. `CHANGELOG.md` aktualisieren, Version in `main.go` prüfen.
-2. Tag setzen: `git tag v1.2.0 && git push origin v1.2.0`
+2. Auf GitHub **Actions → Release → Run workflow** (Branch `main`) starten – alternativ Tag setzen: `git tag v1.2.1 && git push origin v1.2.1`
 3. GitHub Actions erstellt einen **Release-Entwurf** mit ZIPs für Windows (x64, ARM64), macOS (Apple Silicon, Intel), Linux und `SHA256SUMS.txt`.
 4. Release-Text prüfen (Vorlage unten) und veröffentlichen.
 5. Repository auf *Public* stellen: *Settings → General → Danger Zone → Change visibility*. *(erledigt 09.10.2026)*

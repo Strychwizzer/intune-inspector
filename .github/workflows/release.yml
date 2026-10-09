@@ -1,9 +1,13 @@
 name: Release
 
-# Wird durch ein Versions-Tag ausgelöst, z. B.:  git tag v1.1.0 && git push origin v1.1.0
+# Zwei Wege:
+#  1. Auf GitHub: Actions → Release → „Run workflow“ (Version aus main.go wird verwendet)
+#  2. Per Tag:   git tag v1.2.1 && git push origin v1.2.1
+# In beiden Fällen entsteht ein Release-Entwurf mit allen Paketen, der danach nur noch veröffentlicht werden muss.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,18 +29,35 @@ jobs:
           node logic.test.mjs
           node scan-mock.test.mjs
           node i18n.test.mjs
-      - name: Version aus Tag mit main.go abgleichen
+      - name: Version ermitteln
+        id: ver
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
           CODE="$(sed -n 's/^const appVersion = "\(.*\)"/\1/p' main.go)"
-          if [ "$TAG" != "$CODE" ]; then echo "Tag v$TAG passt nicht zu appVersion $CODE in main.go"; exit 1; fi
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG="${GITHUB_REF_NAME#v}"
+            if [ "$TAG" != "$CODE" ]; then echo "Tag v$TAG passt nicht zu appVersion $CODE in main.go"; exit 1; fi
+          fi
+          echo "version=$CODE" >> "$GITHUB_OUTPUT"
+      - name: Release-Text aus CHANGELOG.md
+        run: |
+          awk -v v="${{ steps.ver.outputs.version }}" '
+            $0 ~ "^## " v " " { on=1; next }
+            on && /^## / { exit }
+            on { print }
+          ' CHANGELOG.md > release-notes.md
+          printf '\n---\n**Download:** Windows: `IntuneInspector-%s-windows-x64.zip` · macOS: `…-macos-apple-silicon.zip` / `…-macos-intel.zip` · Linux: `…-linux-x64.zip`\n\nEinrichtung / Setup: [docs/einrichtung.md](https://github.com/%s/blob/main/docs/einrichtung.md) · [README.en.md](https://github.com/%s/blob/main/README.en.md)\n' \
+            "${{ steps.ver.outputs.version }}" "$GITHUB_REPOSITORY" "$GITHUB_REPOSITORY" >> release-notes.md
+          cat release-notes.md
       - name: Bauen und packen
-        run: tools/package.sh "${GITHUB_REF_NAME#v}"
-      - name: Release erstellen
+        run: tools/package.sh "${{ steps.ver.outputs.version }}"
+      - name: Release-Entwurf erstellen
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: Intune Inspector ${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
           draft: true
-          generate_release_notes: true
+          body_path: release-notes.md
           files: |
             dist/*.zip
             dist/SHA256SUMS.txt

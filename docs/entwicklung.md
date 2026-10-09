@@ -121,8 +121,8 @@ go build -o IntuneInspector.exe .   # nur für das aktuelle System
 
 1. Version in `main.go` (`appVersion`) und Titel in `LIESMICH.md` anheben, `CHANGELOG.md` ergänzen.
 2. Committen und pushen.
-3. Tag setzen: `git tag v1.2.0 && git push origin v1.2.0`
-4. Die Action *Release* baut alles und legt einen **Release-Entwurf** an. Dort Text prüfen und veröffentlichen.
+3. Auf GitHub **Actions → Release → Run workflow** starten (oder Tag setzen: `git tag v1.2.0 && git push origin v1.2.0`)
+4. Die Action *Release* testet, baut alle Plattformen, übernimmt den Text aus `CHANGELOG.md` und legt einen **Release-Entwurf** an. Dort prüfen und veröffentlichen.
 
 ## Fremdbibliotheken aktualisieren
 
